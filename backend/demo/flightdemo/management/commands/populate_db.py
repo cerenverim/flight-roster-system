@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from flightdemo.models import Passenger
+from flightdemo.models import Passenger # if there is error here, try to run .py anyway
 from faker import Faker
 import random
 
@@ -24,6 +24,7 @@ class Command(BaseCommand):
 
             temp.append(person)
 
+        # put generated information in database to generate IDs for passengers
         for x in temp:
 
             passenger = Passenger(name=x["name"],
@@ -37,9 +38,11 @@ class Command(BaseCommand):
 
             all_passengers = Passenger.objects.all()
 
+            # Potential list of parents
             parents_m = list(filter(lambda x: x.age >= 18 and x.gender == "Male", all_passengers))
             parents_f = list(filter(lambda x: x.age >= 18 and x.gender == "Female", all_passengers))
 
+            # potentially in the future infant should also inherit surname of one of the parents
             def assign_parents(x):
                 if x.age <= 2:
                     parent1 = fake.random_elements(elements=parents_m, unique=True, length=1)[0]
@@ -57,6 +60,7 @@ class Command(BaseCommand):
             # assign every infant a unique parent couple
             person_list = list(map(assign_parents, all_passengers))
 
+            # DEBUG
             # print(person_list)
 
     def add_arguments(self, parser):
@@ -72,12 +76,12 @@ class Command(BaseCommand):
                 self.generate_passengers(options["flight_number"], options["count"], options["id_start"])
             else:
                 self.generate_passengers(options["flight_number"], options["count"])
+        # WIP
+        # elif args[0] == "FlightCrew":
 
-        #elif args[0] == "FlightCrew":
+        # elif args[0] == "CabinCrew":
 
-        #elif args[0] == "CabinCrew":
-
-        #elif args[0] == "Dish":
+        # elif args[0] == "Dish":
 
 
 
