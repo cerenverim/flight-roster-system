@@ -1,8 +1,7 @@
 from django.db import models
-from django.core.exceptions import ValidationError
 
 # user: admin
-# password: 12345678
+# password: admin
 
 # currently using JSONfield to represent arrays
 # field could also be represented with,
@@ -33,13 +32,13 @@ class Passenger(models.Model):
   nationality = models.CharField(max_length=255)
 
   # if infant(age 0-2) put 1 or 2 parent ids in seat_type
-  seat_type = models.JSONField
-
+  seat_type = models.JSONField()
   flight_number = models.CharField(null=True, blank=True, max_length=6)
 
 
+
 class Flight(models.Model):
-  flight_number = models.CharField(max_length=6)
+  flight_number = models.CharField(primary_key=True, max_length=6)
   flight_info = models.DateTimeField()
   flight_source = models.CharField(max_length=255)
   flight_dest = models.CharField(max_length=255)
