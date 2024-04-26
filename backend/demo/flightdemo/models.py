@@ -68,7 +68,7 @@ class CabinCrew(models.Model):
   nationality = models.CharField(max_length=255)
   languages = models.JSONField()
   attendant_type = models.CharField(max_length=255, null=True, blank=True) # nullable and blank because not all attendants may have a
-  roster_id = models.IntegerField(null=True, blank=True)
+  flight_number = models.CharField(null=True, blank=True, max_length=6)
 
   # unlike pilots, attendants can use multiple vehicles
   vehicle = models.JSONField()
