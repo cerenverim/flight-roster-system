@@ -8,8 +8,6 @@ import random
 
 
 class Command(BaseCommand):
-    args = '<foo bar ...>'
-    help = 'our help string comes here'
 
     def generate_passengers(self, count=100, flight_number="0001"):
 
