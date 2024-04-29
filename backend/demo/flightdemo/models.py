@@ -53,8 +53,7 @@ class CabinCrew(models.Model):
     gender = models.CharField(max_length=100, )
     nationality = models.CharField(max_length=255)
     languages = models.JSONField()
-    attendant_type = models.CharField(max_length=255, null=True,
-                                      blank=True)  # nullable and blank because not all attendants may have a
+    attendant_type = models.CharField(max_length=255, null=True, blank=True)  # nullable and blank because not all attendants may have a
     # unlike pilots, attendants can use multiple vehicles
     vehicle = models.JSONField()
 
@@ -68,8 +67,7 @@ class Roster(models.Model):
     flight_crew_trainee = models.ManyToManyField(FlightCrew, blank=True, related_name="flight_crew_trainee")  # [0..2]
     flight_cabin_crew_senior = models.ManyToManyField(CabinCrew, related_name="flight_cabin_crew_senior")  # [1..4]
     flight_cabin_crew_junior = models.ManyToManyField(CabinCrew, related_name="flight_cabin_crew_junior")  # [4..16]
-    flight_cabin_crew_chef = models.ManyToManyField(CabinCrew, blank=True,
-                                                    related_name="flight_cabin_crew_chef")  # [0..2]
+    flight_cabin_crew_chef = models.ManyToManyField(CabinCrew, blank=True, related_name="flight_cabin_crew_chef")  # [0..2]
     flight_passengers = models.ManyToManyField(Passenger, blank=True, related_name="flight_passengers")  # [0..*]
 
     """
