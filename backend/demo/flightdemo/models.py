@@ -59,6 +59,7 @@ class CabinCrew(models.Model):
 
 
 class Roster(models.Model):
+    # TODO: there can be multiple senior and junior pilots on a roster
     flight_crew_junior = models.ForeignKey(FlightCrew, related_name="flight_crew_junior", on_delete=models.PROTECT)
     flight_crew_senior = models.ForeignKey(FlightCrew, related_name="flight_crew_senior", on_delete=models.PROTECT)
 
