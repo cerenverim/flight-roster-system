@@ -4,18 +4,12 @@ function ManualSelectionPage() {
     const [dataSource, setDataSource] = useState([
         {
             key: '0',
-            id: 'awsdfsdfaf',
-            name: 'awedasdf',
-            type: 'passenger',
-        },
-        {
-            key: '1',
             id: 'asdfasdf',
             name: 'asdasdf',
             type: 'flight crew',
         },
         {
-            key: '2',
+            key: '1',
             id: 'asdfasdf',
             name: 'asdasdf',
             type: 'cabin crew',
@@ -64,7 +58,7 @@ function ManualSelectionPage() {
             render: (_, record) =>
                 dataSource.length >= 1 ? (
                     <Popconfirm title="Sure to delete?" onConfirm={() => handleDelete(record.key)}>
-                        <a>Delete</a>
+                        Delete
                     </Popconfirm>
                 ) : null,
         },
@@ -119,6 +113,7 @@ function ManualSelectionPage() {
             </Space>
             <Table
                 rowClassName={() => 'editable-row'}
+                scroll={{ x: true }}
                 bordered
                 dataSource={dataSource}
                 columns={columns}

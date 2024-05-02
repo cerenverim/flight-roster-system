@@ -4,6 +4,7 @@ import TabularView from '../Components/tabularView';
 import ExtendedView from '../Components/extendedView';
 import PlaneView from '../Components/planeView';
 import AppHeader from '../Components/appHeader';
+import FlightSummary from '../Components/flightSummary';
 const { Header, Content } = Layout;
 
 
@@ -39,6 +40,7 @@ function ViewPage() {
                 <AppHeader />
             </Header>
             <Content>
+                <FlightSummary />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />
                 <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
                     <Button type="primary">CONFIRM</Button>

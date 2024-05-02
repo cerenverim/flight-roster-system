@@ -171,6 +171,7 @@ function TabularView() {
     ];
     return (
         <Table
+            scroll={{ x: true }}
             bordered
             dataSource={dataSource}
             columns={defaultColumns}

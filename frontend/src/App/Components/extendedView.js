@@ -11,37 +11,73 @@ function ExtendedView() {
             key: '0',
             id: 'A78534B219',
             name: 'Marcus Giles',
-            type: 'passenger',
+            age: 25,
+            gender: 'Male',
+            nationality: 'French',
+            languages: 'English',
+            vehicleType: 'A',
+            range: '1000km',
+            level: 'Junior'
         },
         {
             key: '1',
-            id: 'B92733H988',
+            id: 'J78214G911',
             name: 'Leyton Christensen',
-            type: 'flight crew',
+            age: 30,
+            gender: 'Male',
+            nationality: 'English',
+            languages: 'English',
+            vehicleType: 'A',
+            range: '600km',
+            level: 'Senior'
         },
         {
             key: '2',
-            id: 'Y92833G647',
-            name: 'Victoria Atkinson',
-            type: 'cabin crew',
+            id: 'C71234F439',
+            name: 'Viktoria Atkins',
+            age: 21,
+            gender: 'Female',
+            nationality: 'English',
+            languages: 'English, French',
+            vehicleType: 'A',
+            range: '1000km',
+            level: 'Trainee'
         },
         {
             key: '3',
-            id: 'L78534G844',
-            name: 'Rowan Barron',
-            type: 'cabin crew',
+            id: 'K71284G243',
+            name: 'Zubair Rodriguez',
+            age: 35,
+            gender: 'Male',
+            nationality: 'German',
+            languages: 'English, German',
+            vehicleType: 'A',
+            range: '1000km',
+            level: 'Senior'
         },
         {
             key: '4',
-            id: 'Q92733S988',
-            name: 'Zubair Rodrigues',
-            type: 'flight crew',
+            id: 'Y74834B283',
+            name: 'Rowan Barron',
+            age: 26,
+            gender: 'Male',
+            nationality: 'French',
+            languages: 'English, French',
+            vehicleType: 'A,B',
+            range: '1000km',
+            level: 'Trainee'
         },
         {
             key: '5',
-            id: 'Z92833A647',
+            id: 'W77304D849',
             name: 'Siobhan Cantu',
-            type: 'cabin crew',
+            age: 29,
+            gender: 'Female',
+            nationality: 'Russian',
+            languages: 'English,Russian',
+            vehicleType: 'C',
+            range: '400km',
+            level: 'Trainee'
         },
     ]);
     const [cabinSource, setCabinSource] = useState([
@@ -49,75 +85,135 @@ function ExtendedView() {
             key: '0',
             id: 'A78534B219',
             name: 'Marcus Giles',
-            type: 'passenger',
+            age: 25,
+            gender: 'Male',
+            nationality: 'French',
+            languages: 'English',
+            type: 'Regular',
+            vehicleType: 'A',
+            dishes: ''
         },
         {
             key: '1',
-            id: 'B92733H988',
+            id: 'J78214G911',
             name: 'Leyton Christensen',
-            type: 'flight crew',
+            age: 30,
+            gender: 'Male',
+            nationality: 'English',
+            languages: 'English',
+            type: 'Regular',
+            vehicleType: 'A',
+            dishes: ''
         },
         {
             key: '2',
-            id: 'Y92833G647',
-            name: 'Victoria Atkinson',
-            type: 'cabin crew',
+            id: 'C71234F439',
+            name: 'Viktoria Atkins',
+            age: 21,
+            gender: 'Female',
+            nationality: 'English',
+            languages: 'English, French',
+            type: 'Regular',
+            vehicleType: 'A',
+            dishes: ''
         },
         {
             key: '3',
-            id: 'L78534G844',
-            name: 'Rowan Barron',
-            type: 'cabin crew',
+            id: 'K71284G243',
+            name: 'Zubair Rodriguez',
+            age: 35,
+            gender: 'Male',
+            nationality: 'German',
+            languages: 'English, German',
+            type: 'Chief',
+            vehicleType: 'A',
+            dishes: ''
         },
         {
             key: '4',
-            id: 'Q92733S988',
-            name: 'Zubair Rodrigues',
-            type: 'flight crew',
+            id: 'Y74834B283',
+            name: 'Rowan Barron',
+            age: 26,
+            gender: 'Male',
+            nationality: 'French',
+            languages: 'English, French',
+            type: 'Chef',
+            vehicleType: 'A,B',
+            dishes: 'Creme Brulee'
         },
         {
             key: '5',
-            id: 'Z92833A647',
+            id: 'W77304D849',
             name: 'Siobhan Cantu',
-            type: 'cabin crew',
+            age: 29,
+            gender: 'Female',
+            nationality: 'Russian',
+            languages: 'English,Russian',
+            type: 'Chef',
+            vehicleType: 'C',
+            dishes: 'Lava Cake'
         },
     ]);
     const [passengerSource, setPassengerSource] = useState([
         {
             key: '0',
-            id: 'A78534B219',
+            passengerId: 'A78534B219',
+            flightId: 'X12345Y678',
             name: 'Marcus Giles',
-            type: 'passenger',
+            age: 25,
+            gender: 'Male',
+            nationality: 'French',
+            seatType: 'Economy',
         },
         {
             key: '1',
-            id: 'B92733H988',
+            passengerId: 'J78214G911',
+            flightId: 'M98765N432',
             name: 'Leyton Christensen',
-            type: 'flight crew',
+            age: 30,
+            gender: 'Male',
+            nationality: 'English',
+            seatType: 'Business',
         },
         {
             key: '2',
-            id: 'Y92833G647',
-            name: 'Victoria Atkinson',
-            type: 'cabin crew',
+            passengerId: 'C71234F439',
+            flightId: 'Q24680R135',
+            name: 'Viktoria Atkins',
+            age: 21,
+            gender: 'Female',
+            nationality: 'English',
+            seatType: 'Business',
         },
         {
             key: '3',
-            id: 'L78534G844',
-            name: 'Rowan Barron',
-            type: 'cabin crew',
+            passengerId: 'K71284G243',
+            flightId: 'S54321T987',
+            name: 'Zubair Rodriguez',
+            age: 35,
+            gender: 'Male',
+            nationality: 'German',
+            seatType: 'Economy',
         },
         {
             key: '4',
-            id: 'Q92733S988',
-            name: 'Zubair Rodrigues',
-            type: 'flight crew',
+            passengerId: 'Y74834B283',
+            flightId: 'C98765D432',
+            name: 'Rowan Barron',
+            age: 26,
+            gender: 'Male',
+            nationality: 'French',
+            seatType: 'Economy',
         },
         {
             key: '5',
-            id: 'Z92833A647',
+            passengerId: 'W77304D849',
+            flightId: 'G45678H901',
             name: 'Siobhan Cantu',
-            type: 'cabin crew',
+            age: 29,
+            gender: 'Female',
+            nationality: 'Russian',
+            seatType: 'Economy',
         },
     ]);
     const [searchText, setSearchText] = useState('');
@@ -335,9 +431,9 @@ function ExtendedView() {
         },
         {
             title: 'Flight ID',
-            dataIndex: 'flightID',
-            key: 'flightID',
-            ...getColumnSearchProps('flightID'),
+            dataIndex: 'flightId',
+            key: 'flightId',
+            ...getColumnSearchProps('flightId'),
         },
         {
             title: 'Name',
@@ -377,6 +473,7 @@ function ExtendedView() {
                 <Col span={24}>
                     <Typography.Title level={3}>Flight Crew</Typography.Title>
                     <Table
+                        scroll={{ x: true }}
                         bordered
                         dataSource={flightSource}
                         columns={flightColumns}
@@ -388,6 +485,7 @@ function ExtendedView() {
                 <Col span={24}>
                     <Typography.Title level={3}>Cabin Crew</Typography.Title>
                     <Table
+                        scroll={{ x: true }}
                         bordered
                         dataSource={cabinSource}
                         columns={cabinColumns}
@@ -398,6 +496,7 @@ function ExtendedView() {
                 <Col span={24}>
                     <Typography.Title level={3}>Passengers</Typography.Title>
                     <Table
+                        scroll={{ x: true }}
                         bordered
                         dataSource={passengerSource}
                         columns={passengerColumns}
