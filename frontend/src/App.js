@@ -12,7 +12,7 @@ import FlightSelectionPage from './App/Pages/flightSelection';
 
 function App() {
   return (
-    <>
+    <div style={{ height: '100%', width: '100%' }}>
       <nav>
         <ul>
           <li>
@@ -47,7 +47,7 @@ function App() {
         <Route path="/manualSelection" element={<ManualSelectionPage />} />
         <Route path="/flightSelection" element={<FlightSelectionPage />} />
       </Routes>
-    </>
+    </div>
   );
 }
 
