@@ -50,3 +50,15 @@ def add_crew_member(request):
         new_crew_member.save()
         return redirect('crew-list-view')
     return render(request, 'flights/add_crew_member.html')
+
+
+# updating flight details such duration, distance etc...
+def update_flight(request, flight_number):
+    flight = get_object_or_404(Flight, flight_number=flight_number)
+    if request.method == 'POST':
+        flight.date = request.POST.get('date', flight.date)
+        flight.duration = request.POST.get('duration', flight.duration)
+        flight.distance = request.POST.get('distance', flight.distance)
+        flight.save()
+        return redirect('flight-detail', flight_number=flight_number)
+    return render(request, 'flights/update_flight.html', {'flight': flight})
