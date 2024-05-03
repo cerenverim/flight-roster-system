@@ -1,6 +1,6 @@
 from django.shortcuts import render, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from .models import Flight, Passenger
+from .models import Flight, Passenger, CabinCrew
 
 # Create your views here.
 def home(request):
@@ -39,3 +39,14 @@ def add_passenger(request, flight_number):
         new_passenger.save()
         return redirect('flight-detail', flight_number=flight_number)
     return render(request, 'flights/add_passenger.html')
+
+# registering new crew member
+def add_crew_member(request):
+    if request.method == 'POST':
+        new_crew_member = CabinCrew(
+            name=request.POST.get('name'),
+            role=request.POST.get('role')
+        )
+        new_crew_member.save()
+        return redirect('crew-list-view')
+    return render(request, 'flights/add_crew_member.html')
