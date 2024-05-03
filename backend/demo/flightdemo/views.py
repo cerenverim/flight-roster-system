@@ -25,3 +25,17 @@ def add_flight(request):
         new_flight.save()
         return redirect('some-view-name')
     return render(request, 'flights/add_flight.html')
+
+# adding new passenger to flight
+def add_passenger(request, flight_number):
+    if request.method == 'POST':
+        flight = get_object_or_404(Flight, flight_number=flight_number)
+        new_passenger = Passenger(
+            name=request.POST.get('name'),
+            seat_type=request.POST.get('seat_type'),
+            special_needs=request.POST.get('special_needs'),
+            flight=flight
+        )
+        new_passenger.save()
+        return redirect('flight-detail', flight_number=flight_number)
+    return render(request, 'flights/add_passenger.html')
