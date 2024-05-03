@@ -11,8 +11,6 @@ from rest_framework.decorators import authentication_classes, permission_classes
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-# Create your views here.
-# https://www.youtube.com/watch?v=llrIu4Qsl7c
 @api_view(['GET'])
 def home(request):
     return Response({})
