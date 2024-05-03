@@ -62,3 +62,14 @@ def update_flight(request, flight_number):
         flight.save()
         return redirect('flight-detail', flight_number=flight_number)
     return render(request, 'flights/update_flight.html', {'flight': flight})
+
+# updating passenger details 
+def update_passenger(request, passenger_id):
+    passenger = get_object_or_404(Passenger, id=passenger_id)
+    if request.method == 'POST':
+        passenger.name = request.POST.get('name', passenger.name)
+        passenger.seat_type = request.POST.get('seat_type', passenger.seat_type)
+        passenger.special_needs = request.POST.get('special_needs', passenger.special_needs)
+        passenger.save()
+        return redirect('flight-detail', flight_number=passenger.flight.flight_number)
+    return render(request, 'flights/update_passenger.html', {'passenger': passenger})
