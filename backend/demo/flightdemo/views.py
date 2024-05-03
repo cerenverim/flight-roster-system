@@ -80,3 +80,16 @@ def delete_flight(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     flight.delete()
     return redirect('flights-list')
+
+# removing passenger from the flight based on his/her id
+def delete_passenger(request, passenger_id):
+    passenger = get_object_or_404(Passenger, id=passenger_id)
+    flight_number = passenger.flight.flight_number
+    passenger.delete()
+    return redirect('flight-detail', flight_number=flight_number)
+
+# deleting staff record 
+def delete_staff(request, crew_member_id):
+    crew_member = get_object_or_404(CabinCrew, id=crew_member_id)
+    crew_member.delete()
+    return redirect('crew-list-view')
