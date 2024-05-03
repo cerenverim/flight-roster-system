@@ -73,3 +73,10 @@ def update_passenger(request, passenger_id):
         passenger.save()
         return redirect('flight-detail', flight_number=passenger.flight.flight_number)
     return render(request, 'flights/update_passenger.html', {'passenger': passenger})
+
+
+# deleting flight based on its number
+def delete_flight(request, flight_number):
+    flight = get_object_or_404(Flight, flight_number=flight_number)
+    flight.delete()
+    return redirect('flights-list')
