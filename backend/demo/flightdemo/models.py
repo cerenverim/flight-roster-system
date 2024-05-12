@@ -31,9 +31,25 @@ class Passenger(models.Model):
     age = models.IntegerField()
     gender = models.CharField(max_length=100)
     nationality = models.CharField(max_length=255)
+    flight_number = models.JSONField(default=list)
 
     # if infant(age 0-2) put 1 or 2 parent ids in seat_type
     seat_type = models.JSONField()
+
+
+class VehicleType(models.Model):
+    vehicle_name = models.CharField(max_length=255)
+    vehicle_capacity = models.IntegerField()
+
+    # the id of the seating plan determines the type of seating  plan
+    # that will be used for this vehicle
+
+    # might change into class in the future
+    vehicle_seating_plan = models.IntegerField()
+
+    # standart menu for every vehicle type
+    # chef specialty menus will be ADDED to the standart menu when chef is assigned
+    vehicle_menu = models.TextField(blank=True, null=True)
 
 
 class FlightCrew(models.Model):
@@ -42,9 +58,10 @@ class FlightCrew(models.Model):
     gender = models.CharField(max_length=100)
     nationality = models.CharField(max_length=255)
     languages = models.JSONField()
-    vehicle = models.CharField(max_length=255)
+    vehicle = models.ForeignKey(VehicleType, on_delete=models.PROTECT)
     range = models.IntegerField()
     seniority = models.CharField(max_length=255)
+    flight_number = models.JSONField(default=list)
 
 
 class CabinCrew(models.Model):
@@ -56,12 +73,13 @@ class CabinCrew(models.Model):
     attendant_type = models.CharField(max_length=255, null=True, blank=True)  # nullable and blank because not all attendants may have a
     # unlike pilots, attendants can use multiple vehicles
     vehicle = models.JSONField()
+    flight_number = models.JSONField(default=list)
 
 
 class Roster(models.Model):
     # TODO: there can be multiple senior and junior pilots on a roster
-    flight_crew_junior = models.ForeignKey(FlightCrew, related_name="flight_crew_junior", on_delete=models.PROTECT)
-    flight_crew_senior = models.ForeignKey(FlightCrew, related_name="flight_crew_senior", on_delete=models.PROTECT)
+    flight_crew_junior = models.ForeignKey(FlightCrew, related_name="flight_crew_junior", on_delete=models.DO_NOTHING)
+    flight_crew_senior = models.ForeignKey(FlightCrew, related_name="flight_crew_senior", on_delete=models.DO_NOTHING)
 
     # enforce limit on business logic level
 
@@ -91,22 +109,6 @@ class Roster(models.Model):
       
     """
 
-
-class VehicleType(models.Model):
-    vehicle_name = models.CharField(max_length=255)
-    vehicle_capacity = models.IntegerField()
-
-    # the id of the seating plan determines the type of seating  plan
-    # that will be used for this vehicle
-
-    # might change into class in the future
-    vehicle_seating_plan = models.IntegerField()
-
-    # standart menu for every vehicle type
-    # chef specialty menus will be ADDED to the standart menu when chef is assigned
-    vehicle_menu = models.TextField(blank=True, null=True)
-
-
 class SharedFlightInfo(models.Model):
     shared_flight_number = models.CharField(max_length=255)
     shared_flight_company = models.CharField(max_length=255)
@@ -114,24 +116,27 @@ class SharedFlightInfo(models.Model):
 
 
 class Flight(models.Model):
-    flight_number = models.CharField(primary_key=True, max_length=6)
+    flight_number = models.CharField(max_length=6)
     flight_roster = models.ForeignKey(Roster, on_delete=models.CASCADE)
-    flight_info = models.DateTimeField()
+
+    flight_date = models.DateTimeField()
+    flight_duration = models.DurationField()
+    flight_distance = models.IntegerField()
 
     flight_src_country = models.CharField(max_length=255)
     flight_src_city = models.CharField(max_length=255)
     flight_src_airport_name = models.CharField(max_length=255)
-    flight_src_airport_code = models.CharField(max_length=6)
+    flight_src_airport_code = models.CharField(max_length=3)
 
     flight_dest_country = models.CharField(max_length=255)
     flight_dest_city = models.CharField(max_length=255)
     flight_dest_airport_name = models.CharField(max_length=255)
-    flight_dest_airport_code = models.CharField(max_length=6)
+    flight_dest_airport_code = models.CharField(max_length=3)
 
     vehicle_type = models.ForeignKey(VehicleType, on_delete=models.PROTECT)
     shared_flight = models.ForeignKey(SharedFlightInfo, on_delete=models.CASCADE, blank=True, null=True)
 
-    # consists of standart menu from vehicleType and cheft specialty dishes
+    # consists of standart menu from vehicleType and chef specialty dishes
     # dish is randomly selected from one of the chefs in flight roster
 
     # maybe not necessary?
@@ -144,8 +149,3 @@ class Flight(models.Model):
 class Dish(models.Model):
     chef_id = models.ForeignKey(CabinCrew, on_delete=models.PROTECT)
     dish = models.TextField()
-
-
-class User(models.Model):
-    username = models.CharField(max_length=255)
-    password = models.CharField(max_length=255)
