@@ -1,7 +1,9 @@
 from django.shortcuts import render, HttpResponse, get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
+from .models import Flight, Passenger, CabinCrew
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-
+from rest_framework.views import APIView
 from .serializers import UserSerializer
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -58,20 +60,14 @@ def list_flights(request):
     flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
     return render(request, 'flights/list.html', {'flights': flights})
 
-# reviewing flight details
-def flight_details(request, flight_number):
-    flight = get_object_or_404(Flight, flight_number=flight_number)
-    crew = flight.flight_roster.flight_crew_senior.all()  # Extend to other crew as needed
-    passengers = flight.flight_roster.flight_passengers.all()
-    return render(request, 'flights/detail.html', {'flight': flight, 'crew': crew, 'passengers': passengers})
+class ListFlightsView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
-# adding flight and creating instance from POST
-def add_flight(request):
-    if request.method == 'POST':
-        new_flight = Flight(flight_number=request.POST.get('flight_number'),)
-        new_flight.save()
-        return redirect('some-view-name')
-    return render(request, 'flights/add_flight.html')
+    def get(self, request, *args, **kwargs):
+        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
+        return render(request, 'flights/list.html', {'flights': flights})
+
 
 # adding new passenger to flight
 def add_passenger(request, flight_number):
