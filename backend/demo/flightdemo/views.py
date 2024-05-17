@@ -145,15 +145,21 @@ class UpdateFlightView(APIView):
         return redirect('flight_details', flight_number=flight_number)
 
 # updating passenger details 
-def update_passenger(request, passenger_id):
-    passenger = get_object_or_404(Passenger, id=passenger_id)
-    if request.method == 'POST':
+class UpdatePassengerView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, passenger_id, *args, **kwargs):
+        passenger = get_object_or_404(Passenger, id=passenger_id)
+        return render(request, 'flights/update_passenger.html', {'passenger': passenger})
+
+    def post(self, request, passenger_id, *args, **kwargs):
+        passenger = get_object_or_404(Passenger, id=passenger_id)
         passenger.name = request.POST.get('name', passenger.name)
         passenger.seat_type = request.POST.get('seat_type', passenger.seat_type)
         passenger.special_needs = request.POST.get('special_needs', passenger.special_needs)
         passenger.save()
-        return redirect('flight-detail', flight_number=passenger.flight.flight_number)
-    return render(request, 'flights/update_passenger.html', {'passenger': passenger})
+        return redirect('flight_details', flight_number=passenger.flight.flight_number)
 
 
 # deleting flight based on its number
