@@ -163,10 +163,14 @@ class UpdatePassengerView(APIView):
 
 
 # deleting flight based on its number
-def delete_flight(request, flight_number):
-    flight = get_object_or_404(Flight, flight_number=flight_number)
-    flight.delete()
-    return redirect('flights-list')
+class DeleteFlightView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, flight_number, *args, **kwargs):
+        flight = get_object_or_404(Flight, flight_number=flight_number)
+        flight.delete()
+        return redirect('flights_list')
 
 # removing passenger from the flight based on his/her id
 def delete_passenger(request, passenger_id):
