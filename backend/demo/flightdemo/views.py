@@ -128,15 +128,21 @@ class AddCrewMemberView(APIView):
 
 
 # updating flight details such duration, distance etc...
-def update_flight(request, flight_number):
-    flight = get_object_or_404(Flight, flight_number=flight_number)
-    if request.method == 'POST':
+class UpdateFlightView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, flight_number, *args, **kwargs):
+        flight = get_object_or_404(Flight, flight_number=flight_number)
+        return render(request, 'flights/update_flight.html', {'flight': flight})
+
+    def post(self, request, flight_number, *args, **kwargs):
+        flight = get_object_or_404(Flight, flight_number=flight_number)
         flight.date = request.POST.get('date', flight.date)
         flight.duration = request.POST.get('duration', flight.duration)
         flight.distance = request.POST.get('distance', flight.distance)
         flight.save()
-        return redirect('flight-detail', flight_number=flight_number)
-    return render(request, 'flights/update_flight.html', {'flight': flight})
+        return redirect('flight_details', flight_number=flight_number)
 
 # updating passenger details 
 def update_passenger(request, passenger_id):
