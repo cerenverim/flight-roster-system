@@ -104,15 +104,27 @@ class AddPassengerView(APIView):
         return redirect('flight_details', flight_number=flight_number)
 
 # registering new crew member
-def add_crew_member(request):
-    if request.method == 'POST':
+class AddCrewMemberView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        return render(request, 'flights/add_crew_member.html')
+
+    def post(self, request, *args, **kwargs):
+        name = request.POST.get('name')
+        role = request.POST.get('role')
+
+        if not name or not role:  # Basic validation
+            errors = "Name and role are required."
+            return render(request, 'flights/add_crew_member.html', {'errors': errors})
+
         new_crew_member = CabinCrew(
-            name=request.POST.get('name'),
-            role=request.POST.get('role')
+            name=name,
+            role=role
         )
         new_crew_member.save()
         return redirect('crew-list-view')
-    return render(request, 'flights/add_crew_member.html')
 
 
 # updating flight details such duration, distance etc...
