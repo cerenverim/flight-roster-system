@@ -77,18 +77,31 @@ class FlightDetailsView(APIView):
 
 
 # adding new passenger to flight
-def add_passenger(request, flight_number):
-    if request.method == 'POST':
+class AddPassengerView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, flight_number, *args, **kwargs):
+        return render(request, 'flights/add_passenger.html')
+
+    def post(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
+        name = request.POST.get('name')
+        seat_type = request.POST.get('seat_type')
+        special_needs = request.POST.get('special_needs')
+        
+        if not name or not seat_type:  # Basic validation
+            errors = "Name and seat type are required."
+            return render(request, 'flights/add_passenger.html', {'errors': errors})
+
         new_passenger = Passenger(
-            name=request.POST.get('name'),
-            seat_type=request.POST.get('seat_type'),
-            special_needs=request.POST.get('special_needs'),
+            name=name,
+            seat_type=seat_type,
+            special_needs=special_needs,
             flight=flight
         )
         new_passenger.save()
-        return redirect('flight-detail', flight_number=flight_number)
-    return render(request, 'flights/add_passenger.html')
+        return redirect('flight_details', flight_number=flight_number)
 
 # registering new crew member
 def add_crew_member(request):
