@@ -184,7 +184,11 @@ class DeletePassengerView(APIView):
         return redirect('flight_details', flight_number=flight_number)
 
 # deleting staff record 
-def delete_staff(request, crew_member_id):
-    crew_member = get_object_or_404(CabinCrew, id=crew_member_id)
-    crew_member.delete()
-    return redirect('crew-list-view')
+class DeleteStaffView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, crew_member_id, *args, **kwargs):
+        crew_member = get_object_or_404(CabinCrew, id=crew_member_id)
+        crew_member.delete()
+        return redirect('crew_list_view')

@@ -11,6 +11,7 @@ urlpatterns = [
     path('passenger/<int:passenger_id>/update/', views.UpdatePassengerView.as_view(), name='update_passenger'),
     path('flights/<str:flight_number>/delete/', views.DeleteFlightView.as_view(), name='delete_flight'),
     path('passenger/<int:passenger_id>/delete/', views.DeletePassengerView.as_view(), name='delete_passenger'),
+    path('crew/<int:crew_member_id>/delete/', views.DeleteStaffView.as_view(), name='delete_staff'),
     path("", views.home, name="home"),
     path('register', views.register, name="register"),
     path('login', views.login, name="login"),
