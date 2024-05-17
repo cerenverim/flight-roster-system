@@ -138,9 +138,17 @@ class UpdateFlightView(APIView):
 
     def post(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
-        flight.date = request.POST.get('date', flight.date)
-        flight.duration = request.POST.get('duration', flight.duration)
-        flight.distance = request.POST.get('distance', flight.distance)
+        # Basic validation
+        date = request.POST.get('date')
+        duration = request.POST.get('duration')
+        distance = request.POST.get('distance')
+
+        if date:
+            flight.date = date
+        if duration:
+            flight.duration = duration
+        if distance:
+            flight.distance = distance
         flight.save()
         return redirect('flight_details', flight_number=flight_number)
 
@@ -155,9 +163,17 @@ class UpdatePassengerView(APIView):
 
     def post(self, request, passenger_id, *args, **kwargs):
         passenger = get_object_or_404(Passenger, id=passenger_id)
-        passenger.name = request.POST.get('name', passenger.name)
-        passenger.seat_type = request.POST.get('seat_type', passenger.seat_type)
-        passenger.special_needs = request.POST.get('special_needs', passenger.special_needs)
+        # Basic validation
+        name = request.POST.get('name')
+        seat_type = request.POST.get('seat_type')
+        special_needs = request.POST.get('special_needs')
+
+        if name:
+            passenger.name = name
+        if seat_type:
+            passenger.seat_type = seat_type
+        if special_needs:
+            passenger.special_needs = special_needs
         passenger.save()
         return redirect('flight_details', flight_number=passenger.flight.flight_number)
 
