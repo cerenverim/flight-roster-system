@@ -4,7 +4,7 @@ from .models import Flight, Passenger, CabinCrew
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .serializers import UserSerializer
+from .serializers import CabinCrewSerializer, FlightSerializer, PassengerSerializer, UserSerializer
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import User
@@ -55,14 +55,15 @@ def login(request):
 def test_token(request):
     return Response({"passed"})
 
-# Listing all of the flights 
+# Listing all of the flights
 class ListFlightsView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
-        return render(request, 'flights/list.html', {'flights': flights})
+        serializer = FlightSerializer(flights, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 # Viewing the flight details
 class FlightDetailsView(APIView):
@@ -71,140 +72,90 @@ class FlightDetailsView(APIView):
 
     def get(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
-        crew = flight.flight_roster.flight_crew_senior.all()  # Extend to other crew as needed
-        passengers = flight.flight_roster.flight_passengers.all()
-        return render(request, 'flights/detail.html', {'flight': flight, 'crew': crew, 'passengers': passengers})
+        serializer = FlightSerializer(flight)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-# adding new passenger to flight
+# Adding new passenger to flight
 class AddPassengerView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, flight_number, *args, **kwargs):
-        return render(request, 'flights/add_passenger.html')
-
     def post(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
-        name = request.POST.get('name')
-        seat_type = request.POST.get('seat_type')
-        special_needs = request.POST.get('special_needs')
+        serializer = PassengerSerializer(data=request.data)
         
-        if not name or not seat_type:  # Basic validation
-            errors = "Name and seat type are required."
-            return render(request, 'flights/add_passenger.html', {'errors': errors})
+        if serializer.is_valid():
+            serializer.save(flight=flight)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        new_passenger = Passenger(
-            name=name,
-            seat_type=seat_type,
-            special_needs=special_needs,
-            flight=flight
-        )
-        new_passenger.save()
-        return redirect('flight_details', flight_number=flight_number)
-
-# registering new crew member
+# Registering new crew member
 class AddCrewMemberView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, *args, **kwargs):
-        return render(request, 'flights/add_crew_member.html')
-
     def post(self, request, *args, **kwargs):
-        name = request.POST.get('name')
-        role = request.POST.get('role')
+        serializer = CabinCrewSerializer(data=request.data)
 
-        if not name or not role:  # Basic validation
-            errors = "Name and role are required."
-            return render(request, 'flights/add_crew_member.html', {'errors': errors})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        new_crew_member = CabinCrew(
-            name=name,
-            role=role
-        )
-        new_crew_member.save()
-        return redirect('crew-list-view')
-
-
-# updating flight details such duration, distance etc...
+# Updating flight details such as duration, distance, etc.
 class UpdateFlightView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, flight_number, *args, **kwargs):
+    def put(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
-        return render(request, 'flights/update_flight.html', {'flight': flight})
+        serializer = FlightSerializer(flight, data=request.data, partial=True)
 
-    def post(self, request, flight_number, *args, **kwargs):
-        flight = get_object_or_404(Flight, flight_number=flight_number)
-        # Basic validation
-        date = request.POST.get('date')
-        duration = request.POST.get('duration')
-        distance = request.POST.get('distance')
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if date:
-            flight.date = date
-        if duration:
-            flight.duration = duration
-        if distance:
-            flight.distance = distance
-        flight.save()
-        return redirect('flight_details', flight_number=flight_number)
-
-# updating passenger details 
+# Updating passenger details
 class UpdatePassengerView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request, passenger_id, *args, **kwargs):
+    def put(self, request, passenger_id, *args, **kwargs):
         passenger = get_object_or_404(Passenger, id=passenger_id)
-        return render(request, 'flights/update_passenger.html', {'passenger': passenger})
+        serializer = PassengerSerializer(passenger, data=request.data, partial=True)
 
-    def post(self, request, passenger_id, *args, **kwargs):
-        passenger = get_object_or_404(Passenger, id=passenger_id)
-        # Basic validation
-        name = request.POST.get('name')
-        seat_type = request.POST.get('seat_type')
-        special_needs = request.POST.get('special_needs')
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        if name:
-            passenger.name = name
-        if seat_type:
-            passenger.seat_type = seat_type
-        if special_needs:
-            passenger.special_needs = special_needs
-        passenger.save()
-        return redirect('flight_details', flight_number=passenger.flight.flight_number)
-
-
-# deleting flight based on its number
+# Deleting flight based on its number
 class DeleteFlightView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, flight_number, *args, **kwargs):
+    def delete(self, request, flight_number, *args, **kwargs):
         flight = get_object_or_404(Flight, flight_number=flight_number)
         flight.delete()
-        return redirect('flights_list')
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-# removing passenger from the flight based on his/her id
+# Removing passenger from the flight based on his/her id
 class DeletePassengerView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, passenger_id, *args, **kwargs):
+    def delete(self, request, passenger_id, *args, **kwargs):
         passenger = get_object_or_404(Passenger, id=passenger_id)
-        flight_number = passenger.flight.flight_number
         passenger.delete()
-        return redirect('flight_details', flight_number=flight_number)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-# deleting staff record 
+# Deleting staff record
 class DeleteStaffView(APIView):
     authentication_classes = [SessionAuthentication, TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, crew_member_id, *args, **kwargs):
+    def delete(self, request, crew_member_id, *args, **kwargs):
         crew_member = get_object_or_404(CabinCrew, id=crew_member_id)
         crew_member.delete()
-        return redirect('crew_list_view')
+        return Response(status=status.HTTP_204_NO_CONTENT)
