@@ -13,7 +13,6 @@ class CabinCrew(models.Model):
     nationality = models.CharField(max_length=255)
     languages = ArrayField(models.CharField(max_length=255))
 
-    attendant_type = models.IntegerField() # 0 - Chef, 1 - Regular, 2 - Chief
     seniority = models.IntegerField() # 0 - Chef, 1 - Junior, 2 - Senior
     vehicle = models.ManyToManyField("flight_information.VehicleType")
     dishes = models.ManyToManyField(Dish)
