@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from passenger_information.models import Passenger
+from .models import Passenger
 
 class PassengerSerializer(serializers.ModelSerializer):
     class Meta:
