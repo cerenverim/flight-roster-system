@@ -7,6 +7,7 @@ import ViewPage from './App/Pages/view';
 import SearchPage from './App/Pages/search';
 import ManualSelectionPage from './App/Pages/manualSelection';
 import FlightSelectionPage from './App/Pages/flightSelection';
+import UserProfilePage from './App/Pages/userprofile';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Link to="/search" className="nav-item">Search</Link>
         <Link to="/manualSelection" className="nav-item">Manual Selection</Link>
         <Link to="/flightSelection" className="nav-item">Flight Selection</Link>
+        <Link to="/userProfile" className="nav-item">User Profile</Link>
       </nav>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -28,6 +30,7 @@ function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/manualSelection" element={<ManualSelectionPage />} />
         <Route path="/flightSelection" element={<FlightSelectionPage />} />
+        <Route path="/userProfile" element={<UserProfilePage />} />
       </Routes>
     </div>
   );

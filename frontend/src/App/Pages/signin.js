@@ -7,17 +7,39 @@ export default SignInPage
 
 import React, { useState } from 'react';
 import './signin.css';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthApi } from '../APIs/AuthApi';
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '../../actions/userActions';
 
 function SignInPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate();
+    const user = useSelector(state => state.user.currentUser);
+    const dispatch = useDispatch();
+
+    const updateUser = (newUser) => {
+        dispatch(setUser(newUser));
+    }
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Form gönderim işlemleri burada yapılabilir
-        console.log('Email:', email);
-        console.log('Password:', password);
+        try {
+            const userData = {
+                username: email,
+                password: password
+            };;
+            const result = await AuthApi.login(userData);
+            console.log('Login Success:', result);
+            updateUser(result.user);
+            navigate('/userProfile');
+            // Redirect or perform additional actions upon successful login
+        } catch (error) {
+            // Handle login errors, such as showing a notification to the user
+            console.log('Login Failed:', error);
+        }
     };
 
     return (
