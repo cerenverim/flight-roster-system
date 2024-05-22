@@ -8,3 +8,22 @@ body {
   height: 100%;
   width: 100%;
 }
+.navbar {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  background-color: #007bff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-item {
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.nav-item:hover {
+  background-color: #0056b3;
+}
