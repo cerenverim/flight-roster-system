@@ -29,7 +29,7 @@ function App() {
         <Route path="/manualSelection" element={<ManualSelectionPage />} />
         <Route path="/flightSelection" element={<FlightSelectionPage />} />
       </Routes>
-    </>
+    </div>
   );
 }
 
