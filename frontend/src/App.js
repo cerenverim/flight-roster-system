@@ -10,7 +10,7 @@ import FlightSelectionPage from './App/Pages/flightSelection';
 
 function App() {
   return (
-    <>
+    <div>
       <nav className="navbar">
         <Link to="/" className="nav-item">Landing</Link>
         <Link to="/signIn" className="nav-item">Sign In</Link>
