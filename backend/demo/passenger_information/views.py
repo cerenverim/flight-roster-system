@@ -8,19 +8,6 @@ from .models import Passenger
 from .serializers import PassengerSerializer
 from flight_information.models import Flight
 
-# Adding new passenger to flight
-class AddPassengerView(APIView):
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, flight_number, *args, **kwargs):
-        flight = get_object_or_404(Flight, flight_number=flight_number)
-        serializer = PassengerSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save(flight=flight)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Updating passenger details
 class UpdatePassengerView(APIView):
