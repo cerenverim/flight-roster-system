@@ -17,7 +17,7 @@ function ExtendedView() {
             languages: 'English',
             vehicleType: 'A',
             range: '1000km',
-            level: 'Junior'
+            seniorityLevel: 'Junior'
         },
         {
             key: '1',
@@ -29,7 +29,7 @@ function ExtendedView() {
             languages: 'English',
             vehicleType: 'A',
             range: '600km',
-            level: 'Senior'
+            seniorityLevel: 'Senior'
         },
         {
             key: '2',
@@ -41,7 +41,7 @@ function ExtendedView() {
             languages: 'English, French',
             vehicleType: 'A',
             range: '1000km',
-            level: 'Trainee'
+            seniorityLevel: 'Trainee'
         },
         {
             key: '3',
@@ -53,7 +53,7 @@ function ExtendedView() {
             languages: 'English, German',
             vehicleType: 'A',
             range: '1000km',
-            level: 'Senior'
+            seniorityLevel: 'Senior'
         },
         {
             key: '4',
@@ -65,7 +65,7 @@ function ExtendedView() {
             languages: 'English, French',
             vehicleType: 'A,B',
             range: '1000km',
-            level: 'Trainee'
+            seniorityLevel: 'Trainee'
         },
         {
             key: '5',
@@ -77,7 +77,7 @@ function ExtendedView() {
             languages: 'English,Russian',
             vehicleType: 'C',
             range: '400km',
-            level: 'Trainee'
+            seniorityLevel: 'Trainee'
         },
     ]);
     const [cabinSource, setCabinSource] = useState([
@@ -89,9 +89,10 @@ function ExtendedView() {
             gender: 'Male',
             nationality: 'French',
             languages: 'English',
-            type: 'Regular',
+            attendantType: 'Regular',
             vehicleType: 'A',
-            dishes: ''
+            dishes: '',
+            seniorityLevel: 'Junior'
         },
         {
             key: '1',
@@ -101,9 +102,10 @@ function ExtendedView() {
             gender: 'Male',
             nationality: 'English',
             languages: 'English',
-            type: 'Regular',
+            attendantType: 'Regular',
             vehicleType: 'A',
-            dishes: ''
+            dishes: '',
+            seniorityLevel: 'Senior'
         },
         {
             key: '2',
@@ -113,9 +115,10 @@ function ExtendedView() {
             gender: 'Female',
             nationality: 'English',
             languages: 'English, French',
-            type: 'Regular',
+            attendantType: 'Regular',
             vehicleType: 'A',
-            dishes: ''
+            dishes: '',
+            seniorityLevel: 'Junior'
         },
         {
             key: '3',
@@ -125,9 +128,10 @@ function ExtendedView() {
             gender: 'Male',
             nationality: 'German',
             languages: 'English, German',
-            type: 'Chief',
+            attendantType: 'Chief',
             vehicleType: 'A',
-            dishes: ''
+            dishes: '',
+            seniorityLevel: 'Senior'
         },
         {
             key: '4',
@@ -137,9 +141,10 @@ function ExtendedView() {
             gender: 'Male',
             nationality: 'French',
             languages: 'English, French',
-            type: 'Chef',
+            attendantType: 'Chef',
             vehicleType: 'A,B',
-            dishes: 'Creme Brulee'
+            dishes: 'Creme Brulee',
+            seniorityLevel: 'Trainee'
         },
         {
             key: '5',
@@ -149,9 +154,10 @@ function ExtendedView() {
             gender: 'Female',
             nationality: 'Russian',
             languages: 'English,Russian',
-            type: 'Chef',
+            attendantType: 'Chef',
             vehicleType: 'C',
-            dishes: 'Lava Cake'
+            dishes: 'Lava Cake',
+            seniorityLevel: 'Senior'
         },
     ]);
     const [passengerSource, setPassengerSource] = useState([
@@ -347,10 +353,10 @@ function ExtendedView() {
             ...getColumnSearchProps('languages')
         },
         {
-            title: 'Type',
-            dataIndex: 'type',
-            key: 'type',
-            ...getColumnSearchProps('type')
+            title: 'Attendant Type',
+            dataIndex: 'attendantType',
+            key: 'attendantType',
+            ...getColumnSearchProps('attendantType')
         },
         {
             title: 'Vehicle Type',
@@ -363,6 +369,12 @@ function ExtendedView() {
             dataIndex: 'dishes',
             key: 'dishes',
             ...getColumnSearchProps('dishes')
+        },
+        {
+            title: 'Seniority Level',
+            dataIndex: 'seniorityLevel',
+            key: 'seniorityLevel',
+            ...getColumnSearchProps('seniorityLevel')
         },
     ];
     const flightColumns = [
@@ -416,10 +428,10 @@ function ExtendedView() {
             ...getColumnSearchProps('range')
         },
         {
-            title: 'Level',
-            dataIndex: 'level',
-            key: 'level',
-            ...getColumnSearchProps('level')
+            title: 'Seniority Level',
+            dataIndex: 'seniorityLevel',
+            key: 'seniorityLevel',
+            ...getColumnSearchProps('seniorityLevel')
         }
     ];
     const passengerColumns = [
