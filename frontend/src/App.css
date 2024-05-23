@@ -8,22 +8,23 @@ body {
   height: 100%;
   width: 100%;
 }
+
 .navbar {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-around; /* Bağlantı elemanlarını navbar boyunca eşit olarak dağıtır */
   padding: 10px 0;
-  background-color: #007bff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: #007bff; /* Mavi arka plan rengi */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Hafif bir gölge ekler */
 }
 
 .nav-item {
-  color: white;
-  text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 5px;
-  transition: background-color 0.3s;
+  color: white; /* Metin rengi beyaz */
+  text-decoration: none; /* Altı çizili metni kaldırır */
+  padding: 10px 15px; /* İç boşluk */
+  border-radius: 5px; /* Köşeleri yuvarlatır */
+  transition: background-color 0.3s; /* Renk değişimini animasyonla yumuşatır */
 }
 
 .nav-item:hover {
-  background-color: #0056b3;
+  background-color: #0056b3; /* Fare üzerine gelindiğinde koyu maviye dönüşür */
 }
