@@ -1,7 +1,6 @@
 from django.db import models
 
-from cabin_crew_information.models import CabinCrew
-from cabin_crew_information.models import Dish
+from cabin_crew_information.models import Dish, CabinCrew
 from flight_crew_information.models import FlightCrew
 from passenger_information.models import PlacedPassenger
 
