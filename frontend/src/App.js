@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import { Route, Routes, Link } from 'react-router-dom';
 import LandingPage from './App/Pages/landing';
@@ -8,35 +7,20 @@ import ViewPage from './App/Pages/view';
 import SearchPage from './App/Pages/search';
 import ManualSelectionPage from './App/Pages/manualSelection';
 import FlightSelectionPage from './App/Pages/flightSelection';
-
+import UserProfilePage from './App/Pages/userprofile';
 
 function App() {
   return (
-    <div style={{ height: '100%', width: '100%' }}>
-      <nav>
-        <ul>
-          <li>
-            <Link to="/">Landing</Link>
-          </li>
-          <li>
-            <Link to="/signIn">Sign In</Link>
-          </li>
-          <li>
-            <Link to="/signUp">Sign Up</Link>
-          </li>
-          <li>
-            <Link to="/view">View</Link>
-          </li>
-          <li>
-            <Link to="/search">Search</Link>
-          </li>
-          <li>
-            <Link to="/manualSelection">Manual Selection</Link>
-          </li>
-          <li>
-            <Link to="/flightSelection">Flight Selection</Link>
-          </li>
-        </ul>
+    <div>
+      <nav className="navbar">
+        <Link to="/" className="nav-item">Landing</Link>
+        <Link to="/signIn" className="nav-item">Sign In</Link>
+        <Link to="/signUp" className="nav-item">Sign Up</Link>
+        <Link to="/view" className="nav-item">View</Link>
+        <Link to="/search" className="nav-item">Search</Link>
+        <Link to="/manualSelection" className="nav-item">Manual Selection</Link>
+        <Link to="/flightSelection" className="nav-item">Flight Selection</Link>
+        <Link to="/userProfile" className="nav-item">User Profile</Link>
       </nav>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -46,6 +30,7 @@ function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/manualSelection" element={<ManualSelectionPage />} />
         <Route path="/flightSelection" element={<FlightSelectionPage />} />
+        <Route path="/userProfile" element={<UserProfilePage />} />
       </Routes>
     </div>
   );
