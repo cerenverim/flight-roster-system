@@ -37,8 +37,8 @@ class Command(BaseCommand):
                       "gender": choice[2],
                       "nationality": fake.country(),
                       # 0 - Economy, 1 - Business
-                      "seat_type": fake.random_element(elements=OrderedDict([(0, 0.9),
-                                                                             (1, 0.1)]))}
+                      "seat_type": fake.random_element(elements=OrderedDict([(0, 0.7),
+                                                                             (1, 0.3)]))}
 
             temp.append(person)
 
@@ -245,7 +245,10 @@ class Command(BaseCommand):
                                                            seniority=1)
         junior_cabin_crew = list(junior_cabin_crew)
 
-        passengers = Passenger.objects.all().filter(flight_id="")
+        # 0 - Economy, 1 - Business
+        passengers_business = Passenger.objects.all().filter(flight_id="", seat_type=1)
+
+        passengers_economy = Passenger.objects.all().filter(flight_id="", seat_type=0)
 
         # must contain one senior and one junior pilots
         roster_senior_pilot = random.choice(senior_pilots)
@@ -316,6 +319,15 @@ class Command(BaseCommand):
 
         flight_menu = list(set(flight_menu))
 
+        passengers_business = fake.random_elements(list(passengers_business),
+                                                   length=selected_vehicle.vehicle_business_seats,
+                                                   unique=True)
+        passengers_economy = fake.random_elements(list(passengers_economy),
+                                                   length=selected_vehicle.vehicle_passenger_capacity - selected_vehicle.vehicle_business_seats,
+                                                   unique=True)
+
+        passengers = passengers_economy + passengers_business
+
         # the choice is between plane passenger capacities
         number_of_passengers = selected_vehicle.vehicle_passenger_capacity
 
@@ -331,7 +343,8 @@ class Command(BaseCommand):
                     replaced_passenger_index = random.randrange(number_of_passengers)
 
                     # find passenger with not dependents
-                    while roster_passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None:
+                    while roster_passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
+                            and roster_passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
                         replaced_passenger_index = random.randrange(number_of_passengers)
 
                     roster_passengers[replaced_passenger_index] = parent
@@ -422,10 +435,11 @@ class Command(BaseCommand):
                 dish.save()
                 brownie_dish = dish
 
-            vehicle = VehicleType(vehicle_name="single-aisle aircraft",
+            vehicle = VehicleType(vehicle_name="twin-aisle aircraft",
                                   vehicle_passenger_capacity=180,
                                   vehicle_crew_capacity=20,
                                   vehicle_pilot_capacity=8,
+                                  vehicle_business_seats=60,
                                   vehicle_seating_plan=0)
             vehicle.save()
 
@@ -440,10 +454,11 @@ class Command(BaseCommand):
                 dish.save()
                 bread_roll_dish = dish
 
-            vehicle = VehicleType(vehicle_name="twin-aisle aircraft",
+            vehicle = VehicleType(vehicle_name="single-aisle aircraft",
                                   vehicle_passenger_capacity=80,
                                   vehicle_crew_capacity=12,
                                   vehicle_pilot_capacity=4,
+                                  vehicle_business_seats=20,
                                   vehicle_seating_plan=1)
             vehicle.save()
 
@@ -462,6 +477,7 @@ class Command(BaseCommand):
                                   vehicle_passenger_capacity=20,
                                   vehicle_crew_capacity=6,
                                   vehicle_pilot_capacity=2,
+                                  vehicle_business_seats=20,
                                   vehicle_seating_plan=2)
             vehicle.save()
 
@@ -514,7 +530,7 @@ class Command(BaseCommand):
     def load_airport_data(self):
 
         # data already loaded
-        if len(Location.objects.all()) <= 0:
+        if len(Location.objects.all()) > 0:
             return
 
         airport_data = []
