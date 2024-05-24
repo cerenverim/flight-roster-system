@@ -39,7 +39,7 @@ function ViewPage() {
             }}>
                 <AppHeader />
             </Header>
-            <Content>
+            <Content >
                 <FlightSummary />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />
                 <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
