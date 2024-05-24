@@ -23,6 +23,7 @@ class VehicleType(models.Model):
     vehicle_crew_capacity = models.IntegerField()
     vehicle_pilot_capacity = models.IntegerField()
     vehicle_passenger_capacity = models.IntegerField()
+    vehicle_business_seats = models.IntegerField()
     vehicle_seating_plan = models.IntegerField()
 
     std_menu = models.ManyToManyField(Dish)
