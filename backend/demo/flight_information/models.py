@@ -1,7 +1,6 @@
 from django.db import models
 
-from cabin_crew_information.models import CabinCrew
-from cabin_crew_information.models import Dish
+from cabin_crew_information.models import Dish, CabinCrew
 from flight_crew_information.models import FlightCrew
 from passenger_information.models import PlacedPassenger
 
@@ -34,7 +33,6 @@ class Roster(models.Model):
     flight_crew_senior = models.ManyToManyField(FlightCrew, related_name="flight_crew_senior")
     # enforce limit on business logic level
     flight_crew_trainee = models.ManyToManyField(FlightCrew, related_name="flight_crew_trainee", blank=True)  # [0..2]
-
 
     flight_cabin_crew_senior = models.ManyToManyField(CabinCrew,
                                                       related_name="flight_cabin_crew_senior", blank=True)  # [1..4]
