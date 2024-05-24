@@ -14,6 +14,7 @@ class Passenger(models.Model):
     # If age 0-2, this is parent info. If not, this is affiliated passenger
     affiliated_passenger = models.ManyToManyField('self')
 
+
 class PlacedPassenger(models.Model):
     passenger = models.OneToOneField(Passenger, on_delete=models.PROTECT)
     seat_no = models.IntegerField()
