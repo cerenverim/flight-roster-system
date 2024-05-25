@@ -500,7 +500,7 @@ class Command(BaseCommand):
             passenger.flight_id = flight.flight_number
             passenger.save()
 
-        random_passengers = passengers[:len(passengers)]
+        random_passengers = passengers[:len(passengers) // 2]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
 
         # assign seats for plane
