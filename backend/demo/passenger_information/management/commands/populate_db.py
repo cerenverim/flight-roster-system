@@ -499,7 +499,7 @@ class Command(BaseCommand):
             passenger.flight_id = flight.flight_number
             passenger.save()
 
-        random_passengers = random.sample(passengers, k=(len(passengers))//2)
+        random_passengers = passengers[:len(passengers)]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
 
         # assign seats for plane
@@ -522,8 +522,10 @@ class Command(BaseCommand):
                     replaced_passenger_index = random.randrange(len(passengers))
 
                     # find passenger with no dependents and the same seat type
-                    while passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
-                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
+                    while not (passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None
+                               and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type == parent.seat_type
+                               and passengers[replaced_passenger_index].affiliated_passenger.all().first().age >= 18):
+
                         replaced_passenger_index = random.randrange(len(passengers))
 
                     passengers[replaced_passenger_index].seat_no = None
@@ -534,13 +536,15 @@ class Command(BaseCommand):
 
                     passengers[replaced_passenger_index] = parent
 
-                    # remove seat assignment from other plane
-                    if PlacedPassenger.objects.all().filter(passenger=parent):
+                    parent.seat_no = None
+                    parent.flight_id = flight.flight_number
+                    parent.save()
+
+                    if PlacedPassenger.objects.all().filter(passenger=parent).first():
                         PlacedPassenger.objects.all().filter(passenger=parent).delete()
 
-                        parent.seat_no = None
-                        parent.flight_id = flight.flight_number
-                        parent.save()
+                if PlacedPassenger.objects.all().filter(passenger=parent).first():
+                    PlacedPassenger.objects.all().filter(passenger=parent).delete()
 
                 # give child seat to parent
                 parent.seat_no = passenger.seat_no
@@ -550,6 +554,11 @@ class Command(BaseCommand):
                 # child sits on parent
                 passenger.seat_no = None
                 passenger.save()
+
+                if parent.seat_no:
+                    parent_placement = PlacedPassenger(passenger=parent, seat_no=parent.seat_no)
+                    parent_placement.save()
+
 
     # not in use
     def generate_Roster(self, flight):
