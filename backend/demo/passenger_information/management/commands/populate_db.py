@@ -524,7 +524,8 @@ class Command(BaseCommand):
 
                     # find passenger with no dependents and the same seat type
                     while passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
-                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
+                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type \
+                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().age < 18:
                         replaced_passenger_index = random.randrange(len(passengers))
 
                     passengers[replaced_passenger_index].seat_no = None
