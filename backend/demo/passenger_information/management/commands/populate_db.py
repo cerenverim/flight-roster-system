@@ -202,205 +202,6 @@ class Command(BaseCommand):
 
             chef.dishes.set(dishes)
 
-    def generate_Roster(self, flight):
-
-        # make sure there are enough persons to fill a maximum roster
-        # a maximum roster must have:
-        #   - 1 senior pilot,
-        #   - 1 junior pilot,
-        #   - 2 trainee pilot,
-        #   - 4 senior attendent,
-        #   - 16 junior attendent,
-        #   - 2 chef
-
-        fake = Faker()
-
-        selected_vehicle = random.choice(VehicleType.objects.all())
-
-        # 0 - Trainee, 1 - Junior, 2 - Senior
-
-        senior_pilots = FlightCrew.objects.all().filter(seniority=2,
-                                                        vehicle=selected_vehicle.id)
-        senior_pilots = list(senior_pilots)
-
-        junior_pilots = FlightCrew.objects.all().filter(seniority=1,
-                                                        vehicle=selected_vehicle.id)
-        junior_pilots = list(junior_pilots)
-
-        trainee_pilots = FlightCrew.objects.all().filter(seniority=0,
-                                                         vehicle=selected_vehicle.id)
-        trainee_pilots = list(trainee_pilots)
-
-        # 0 - Chef, 1 - Junior, 2 - Senior
-
-        chefs = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
-                                               seniority=0)
-        chefs = list(chefs)
-
-        senior_cabin_crew = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
-                                                           seniority=2)
-        senior_cabin_crew = list(senior_cabin_crew)
-
-        junior_cabin_crew = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
-                                                           seniority=1)
-        junior_cabin_crew = list(junior_cabin_crew)
-
-        # 0 - Economy, 1 - Business
-        passengers_business = Passenger.objects.all().filter(flight_id="", seat_type=1)
-
-        passengers_economy = Passenger.objects.all().filter(flight_id="", seat_type=0)
-
-        # must contain one senior and one junior pilots
-        roster_senior_pilot = random.choice(senior_pilots)
-        roster_junior_pilot = random.choice(junior_pilots)
-
-        pilot_limit = selected_vehicle.vehicle_pilot_capacity - 2
-
-        # plane has unique trainee limit
-        number_of_trainees = fake.random_int(min=0, max=min(pilot_limit, flight.flight_trainee_limit))
-        roster_trainees = fake.random_elements(trainee_pilots, length=number_of_trainees, unique=True)
-
-        pilot_limit -= number_of_trainees
-
-        number_of_junior_pilots = fake.random_int(min=0, max=math.ceil(pilot_limit / 2))
-        roster_junior_pilots = fake.random_elements(junior_pilots, length=number_of_junior_pilots, unique=True)
-
-        # list(set()) ensures all unique objects
-
-        roster_junior_pilots.append(roster_junior_pilot)
-        roster_junior_pilots = list(set(roster_junior_pilots))
-
-        pilot_limit -= math.ceil(pilot_limit / 2)
-
-        number_of_senior_pilots = fake.random_int(min=0, max=pilot_limit)
-        roster_senior_pilots = fake.random_elements(senior_pilots, length=number_of_senior_pilots, unique=True)
-
-        roster_senior_pilots.append(roster_senior_pilot)
-        roster_senior_pilots = list(set(roster_senior_pilots))
-
-        # at least one senior and 4 junior cabin crew
-
-        min_cabin_senior = random.choice(senior_cabin_crew)
-
-        number_of_juniors = fake.random_int(min=4, max=4)
-        min_cabin_junior = fake.random_elements(junior_cabin_crew, length=number_of_juniors, unique=True)
-
-        cabin_limit = selected_vehicle.vehicle_crew_capacity - 5
-
-        number_of_seniors = fake.random_int(min=0, max=min(3, cabin_limit))
-        roster_senior_cabin = fake.random_elements(senior_cabin_crew, length=number_of_seniors, unique=True)
-
-        roster_senior_cabin.append(min_cabin_senior)
-        roster_senior_cabin = list(set(roster_senior_cabin))
-
-        cabin_limit -= number_of_seniors
-
-        number_of_juniors = fake.random_int(min=0, max=min(12, cabin_limit))
-        roster_junior_cabin = fake.random_elements(junior_cabin_crew, length=number_of_juniors, unique=True)
-
-        roster_junior_cabin = min_cabin_junior + roster_junior_cabin
-
-        roster_junior_cabin = list(set(roster_junior_cabin))
-
-        cabin_limit -= number_of_juniors
-
-        number_of_chefs = fake.random_int(min=0, max=min(2, cabin_limit))
-        roster_chefs = fake.random_elements(chefs, length=number_of_chefs, unique=True)
-
-        flight_menu = []
-
-        # chef specialities added to flight menu
-        for chef in roster_chefs:
-            for dish in chef.dishes.all():
-                flight_menu.append(dish)
-
-        # add one standard menu assigned to selected vehicle type
-        flight_menu.append(selected_vehicle.std_menu.all().first())
-
-        flight_menu = list(set(flight_menu))
-
-        passengers_business = fake.random_elements(list(passengers_business),
-                                                   length=selected_vehicle.vehicle_business_seats,
-                                                   unique=True)
-        passengers_economy = fake.random_elements(list(passengers_economy),
-                                                   length=selected_vehicle.vehicle_passenger_capacity - selected_vehicle.vehicle_business_seats,
-                                                   unique=True)
-
-        passengers = passengers_economy + passengers_business
-
-        # the choice is between plane passenger capacities
-        number_of_passengers = selected_vehicle.vehicle_passenger_capacity
-
-        roster_passengers = fake.random_elements(list(passengers), length=number_of_passengers, unique=True)
-
-        for passenger in roster_passengers:
-
-            if passenger.age <= 2:
-                parent = passenger.affiliated_passenger.all().first()
-
-                if parent not in roster_passengers:
-
-                    replaced_passenger_index = random.randrange(number_of_passengers)
-
-                    # find passenger with not dependents
-                    while roster_passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
-                            and roster_passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
-                        replaced_passenger_index = random.randrange(number_of_passengers)
-
-                    roster_passengers[replaced_passenger_index] = parent
-
-                    # remove seat assignment from other plane
-                    if PlacedPassenger.objects.all().filter(passenger=parent):
-                        PlacedPassenger.objects.all().filter(passenger=parent).delete()
-                        parent.seat_no = None
-
-        for passenger in roster_passengers:
-
-            passenger.flight_id = flight.flight_number
-            passenger.save()
-
-        placed_passengers = []
-
-        # assign seats for plane
-        for i in range(1, len(roster_passengers) + 1):
-
-            passenger = roster_passengers[i-1]
-            placed_passenger = PlacedPassenger(passenger=passenger,
-                                               seat_no=i)
-            placed_passenger.save()
-            placed_passengers.append(placed_passenger)
-
-            passenger.seat_no = i
-            passenger.save()
-
-        random.shuffle(roster_passengers)
-
-        roster = Roster()
-        roster.save()
-
-        roster_junior_pilot_ids = [pilot.id for pilot in roster_junior_pilots]
-        roster_senior_pilot_ids = [pilot.id for pilot in roster_senior_pilots]
-        roster_trainee_ids = [trainee.id for trainee in roster_trainees]
-        roster_senior_cabin_ids = [cabin.id for cabin in roster_senior_cabin]
-        roster_junior_cabin_ids = [cabin.id for cabin in roster_junior_cabin]
-        roster_chef_ids = [chef.id for chef in roster_chefs]
-        roster_placed_passenger_ids = [passenger.id for passenger in placed_passengers]
-        flight_menu_ids = [menu.id for menu in flight_menu]
-
-        roster.flight_crew_junior.set(roster_junior_pilot_ids)
-        roster.flight_crew_senior.set(roster_senior_pilot_ids)
-        roster.flight_crew_trainee.set(roster_trainee_ids)
-        roster.flight_cabin_crew_senior.set(roster_senior_cabin_ids)
-        roster.flight_cabin_crew_junior.set(roster_junior_cabin_ids)
-        roster.flight_cabin_crew_chef.set(roster_chef_ids)
-        roster.flight_passengers.set(roster_placed_passenger_ids)
-        roster.flight_menu.set(flight_menu_ids)
-
-        roster.save()
-
-        flight.flight_roster = roster
-
-        flight.save()
 
     def generate_database(self):
 
@@ -411,7 +212,11 @@ class Command(BaseCommand):
         self.generate_Dish()
         self.load_airport_data()
         for flight_count in range(1, 11):
-            self.auto_full_flight(flight_count)
+
+            self.flight_assignment(flight_count)
+
+            # generate WITH roster
+            # self.auto_full_flight(flight_count)
         Passenger.objects.all().filter(flight_id="").delete()
 
     def delete_database(self):
@@ -535,7 +340,7 @@ class Command(BaseCommand):
 
         airport_data = []
 
-        with open('airport_geodata.txt', 'r', encoding='utf-8') as file:
+        with open('./location/airport_geodata.txt', 'r', encoding='utf-8') as file:
             for line in file:
                 city, country, code, latitude, longitude = line.strip().split("_")
 
@@ -610,7 +415,6 @@ class Command(BaseCommand):
 
         return flight_number
 
-
     def generate_shared_flight_info(self, flight):
 
         fake = Faker()
@@ -656,6 +460,296 @@ class Command(BaseCommand):
             self.generate_shared_flight_info(flight)
 
         self.generate_Roster(flight)
+
+    def flight_assignment(self, flight_number_count):
+
+        flight_number = self.generate_Flight(flight_number_count)
+
+        flight = Flight.objects.all().filter(flight_number=flight_number).first()
+
+        coin_flip = random.randint(0, 1)
+
+        if coin_flip:
+            self.generate_shared_flight_info(flight)
+
+        self.seat_assignment(flight)
+
+    def seat_assignment(self, flight):
+
+        selected_vehicle = flight.vehicle_type
+
+        fake = Faker()
+
+        # 0 - Economy, 1 - Business
+        passengers_business = Passenger.objects.all().filter(flight_id="", seat_type=1)
+
+        passengers_economy = Passenger.objects.all().filter(flight_id="", seat_type=0)
+
+        passengers_business = fake.random_elements(list(passengers_business),
+                                                   length=selected_vehicle.vehicle_business_seats,
+                                                   unique=True)
+        passengers_economy = fake.random_elements(list(passengers_economy),
+                                                  length=selected_vehicle.vehicle_passenger_capacity - selected_vehicle.vehicle_business_seats,
+                                                  unique=True)
+
+        # economy passengers get concatenated to the end of the list
+        passengers = passengers_business + passengers_economy
+
+        for passenger in passengers:
+            passenger.flight_id = flight.flight_number
+            passenger.save()
+
+        random_passengers = random.sample(passengers, k=(len(passengers))//2)
+        seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
+
+        # assign seats for plane
+        for passenger, seat_number in zip(random_passengers, seat_number):
+
+            placed_passenger = PlacedPassenger(passenger=passenger,
+                                               seat_no=seat_number + 1)
+            placed_passenger.save()
+
+            passenger.seat_no = seat_number + 1
+            passenger.save()
+
+        for passenger in passengers:
+
+            if passenger.age <= 2:
+                parent = passenger.affiliated_passenger.all().first()
+
+                if parent not in passengers:
+
+                    replaced_passenger_index = random.randrange(len(passengers))
+
+                    # find passenger with no dependents and the same seat type
+                    while passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
+                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
+                        replaced_passenger_index = random.randrange(len(passengers))
+
+                    passengers[replaced_passenger_index].seat_no = None
+                    passengers[replaced_passenger_index].flight_id = ""
+                    passengers[replaced_passenger_index].save()
+
+                    PlacedPassenger.objects.all().filter(passenger=passengers[replaced_passenger_index]).delete()
+
+                    passengers[replaced_passenger_index] = parent
+
+                    # remove seat assignment from other plane
+                    if PlacedPassenger.objects.all().filter(passenger=parent):
+                        PlacedPassenger.objects.all().filter(passenger=parent).delete()
+
+                        parent.seat_no = None
+                        parent.flight_id = flight.flight_number
+                        parent.save()
+
+                # give child seat to parent
+                parent.seat_no = passenger.seat_no
+                parent.seat_type = passenger.seat_type
+                parent.save()
+
+                # child sits on parent
+                passenger.seat_no = None
+                passenger.save()
+
+    # not in use
+    def generate_Roster(self, flight):
+
+        # make sure there are enough persons to fill a maximum roster
+        # a maximum roster must have:
+        #   - 1 senior pilot,
+        #   - 1 junior pilot,
+        #   - 2 trainee pilot,
+        #   - 4 senior attendent,
+        #   - 16 junior attendent,
+        #   - 2 chef
+
+        fake = Faker()
+
+        selected_vehicle = random.choice(VehicleType.objects.all())
+
+        # 0 - Trainee, 1 - Junior, 2 - Senior
+
+        senior_pilots = FlightCrew.objects.all().filter(seniority=2,
+                                                        vehicle=selected_vehicle.id)
+        senior_pilots = list(senior_pilots)
+
+        junior_pilots = FlightCrew.objects.all().filter(seniority=1,
+                                                        vehicle=selected_vehicle.id)
+        junior_pilots = list(junior_pilots)
+
+        trainee_pilots = FlightCrew.objects.all().filter(seniority=0,
+                                                         vehicle=selected_vehicle.id)
+        trainee_pilots = list(trainee_pilots)
+
+        # 0 - Chef, 1 - Junior, 2 - Senior
+
+        chefs = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
+                                               seniority=0)
+        chefs = list(chefs)
+
+        senior_cabin_crew = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
+                                                           seniority=2)
+        senior_cabin_crew = list(senior_cabin_crew)
+
+        junior_cabin_crew = CabinCrew.objects.all().filter(vehicle=selected_vehicle,
+                                                           seniority=1)
+        junior_cabin_crew = list(junior_cabin_crew)
+
+        # 0 - Economy, 1 - Business
+        passengers_business = Passenger.objects.all().filter(flight_id="", seat_type=1)
+
+        passengers_economy = Passenger.objects.all().filter(flight_id="", seat_type=0)
+
+        # must contain one senior and one junior pilots
+        roster_senior_pilot = random.choice(senior_pilots)
+        roster_junior_pilot = random.choice(junior_pilots)
+
+        pilot_limit = selected_vehicle.vehicle_pilot_capacity - 2
+
+        # plane has unique trainee limit
+        number_of_trainees = fake.random_int(min=0, max=min(pilot_limit, flight.flight_trainee_limit))
+        roster_trainees = fake.random_elements(trainee_pilots, length=number_of_trainees, unique=True)
+
+        pilot_limit -= number_of_trainees
+
+        number_of_junior_pilots = fake.random_int(min=0, max=math.ceil(pilot_limit / 2))
+        roster_junior_pilots = fake.random_elements(junior_pilots, length=number_of_junior_pilots, unique=True)
+
+        # list(set()) ensures all unique objects
+
+        roster_junior_pilots.append(roster_junior_pilot)
+        roster_junior_pilots = list(set(roster_junior_pilots))
+
+        pilot_limit -= math.ceil(pilot_limit / 2)
+
+        number_of_senior_pilots = fake.random_int(min=0, max=pilot_limit)
+        roster_senior_pilots = fake.random_elements(senior_pilots, length=number_of_senior_pilots, unique=True)
+
+        roster_senior_pilots.append(roster_senior_pilot)
+        roster_senior_pilots = list(set(roster_senior_pilots))
+
+        # at least one senior and 4 junior cabin crew
+
+        min_cabin_senior = random.choice(senior_cabin_crew)
+
+        number_of_juniors = fake.random_int(min=4, max=4)
+        min_cabin_junior = fake.random_elements(junior_cabin_crew, length=number_of_juniors, unique=True)
+
+        cabin_limit = selected_vehicle.vehicle_crew_capacity - 5
+
+        number_of_seniors = fake.random_int(min=0, max=min(3, cabin_limit))
+        roster_senior_cabin = fake.random_elements(senior_cabin_crew, length=number_of_seniors, unique=True)
+
+        roster_senior_cabin.append(min_cabin_senior)
+        roster_senior_cabin = list(set(roster_senior_cabin))
+
+        cabin_limit -= number_of_seniors
+
+        number_of_juniors = fake.random_int(min=0, max=min(12, cabin_limit))
+        roster_junior_cabin = fake.random_elements(junior_cabin_crew, length=number_of_juniors, unique=True)
+
+        roster_junior_cabin = min_cabin_junior + roster_junior_cabin
+
+        roster_junior_cabin = list(set(roster_junior_cabin))
+
+        cabin_limit -= number_of_juniors
+
+        number_of_chefs = fake.random_int(min=0, max=min(2, cabin_limit))
+        roster_chefs = fake.random_elements(chefs, length=number_of_chefs, unique=True)
+
+        flight_menu = []
+
+        # chef specialities added to flight menu
+        for chef in roster_chefs:
+            for dish in chef.dishes.all():
+                flight_menu.append(dish)
+
+        # add one standard menu assigned to selected vehicle type
+        flight_menu.append(selected_vehicle.std_menu.all().first())
+
+        flight_menu = list(set(flight_menu))
+
+        passengers_business = fake.random_elements(list(passengers_business),
+                                                   length=selected_vehicle.vehicle_business_seats,
+                                                   unique=True)
+        passengers_economy = fake.random_elements(list(passengers_economy),
+                                                  length=selected_vehicle.vehicle_passenger_capacity - selected_vehicle.vehicle_business_seats,
+                                                  unique=True)
+
+        passengers = passengers_economy + passengers_business
+
+        # the choice is between plane passenger capacities
+        number_of_passengers = selected_vehicle.vehicle_passenger_capacity
+
+        roster_passengers = fake.random_elements(list(passengers), length=number_of_passengers, unique=True)
+
+        for passenger in roster_passengers:
+
+            if passenger.age <= 2:
+                parent = passenger.affiliated_passenger.all().first()
+
+                if parent not in roster_passengers:
+
+                    replaced_passenger_index = random.randrange(number_of_passengers)
+
+                    # find passenger with not dependents
+                    while roster_passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
+                            and roster_passengers[
+                        replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type:
+                        replaced_passenger_index = random.randrange(number_of_passengers)
+
+                    roster_passengers[replaced_passenger_index] = parent
+
+                    # remove seat assignment from other plane
+                    if PlacedPassenger.objects.all().filter(passenger=parent):
+                        PlacedPassenger.objects.all().filter(passenger=parent).delete()
+                        parent.seat_no = None
+
+        for passenger in roster_passengers:
+            passenger.flight_id = flight.flight_number
+            passenger.save()
+
+        placed_passengers = []
+
+        # assign seats for plane
+        for i in range(1, len(roster_passengers) + 1):
+            passenger = roster_passengers[i - 1]
+            placed_passenger = PlacedPassenger(passenger=passenger,
+                                               seat_no=i)
+            placed_passenger.save()
+            placed_passengers.append(placed_passenger)
+
+            passenger.seat_no = i
+            passenger.save()
+
+        random.shuffle(roster_passengers)
+
+        roster = Roster()
+        roster.save()
+
+        roster_junior_pilot_ids = [pilot.id for pilot in roster_junior_pilots]
+        roster_senior_pilot_ids = [pilot.id for pilot in roster_senior_pilots]
+        roster_trainee_ids = [trainee.id for trainee in roster_trainees]
+        roster_senior_cabin_ids = [cabin.id for cabin in roster_senior_cabin]
+        roster_junior_cabin_ids = [cabin.id for cabin in roster_junior_cabin]
+        roster_chef_ids = [chef.id for chef in roster_chefs]
+        roster_placed_passenger_ids = [passenger.id for passenger in placed_passengers]
+        flight_menu_ids = [menu.id for menu in flight_menu]
+
+        roster.flight_crew_junior.set(roster_junior_pilot_ids)
+        roster.flight_crew_senior.set(roster_senior_pilot_ids)
+        roster.flight_crew_trainee.set(roster_trainee_ids)
+        roster.flight_cabin_crew_senior.set(roster_senior_cabin_ids)
+        roster.flight_cabin_crew_junior.set(roster_junior_cabin_ids)
+        roster.flight_cabin_crew_chef.set(roster_chef_ids)
+        roster.flight_passengers.set(roster_placed_passenger_ids)
+        roster.flight_menu.set(flight_menu_ids)
+
+        roster.save()
+
+        flight.flight_roster = roster
+
+        flight.save()
 
     def add_arguments(self, parser):
         parser.add_argument('persons')
