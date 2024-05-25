@@ -3,16 +3,25 @@ import { Layout, Button, Space } from 'antd';
 import AppHeader from '../Components/appHeader';
 import FlightSummary from '../Components/flightSummary';
 import './landing.css';
+import { FlightApi } from '../APIs/FlightApi';
+import FlightCard from '../Components/flightCard';
 const { Header, Content } = Layout;
 function LandingPage() {
+
+
     const [searchType, setSearchType] = useState('flightID');
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
     const [depart, setDepart] = useState('');
     const [returnDate, setReturnDate] = useState('');
     const [flightID, setFlightID] = useState('');
+    const [flights, setFlights] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
 
     const handleSearchTypeChange = (event) => {
+        setFlights([]);
         setSearchType(event.target.value);
     };
 
@@ -20,14 +29,33 @@ function LandingPage() {
         setter(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (searchType === 'flightInfo') {
-            console.log(`Searching for flights from ${from} to ${to} departing on ${depart} and returning on ${returnDate}`);
-        } else {
-            console.log(`Searching for flight with ID: ${flightID}`);
+        setIsLoading(true);
+        setError('');
+        try {
+            if (searchType === 'flightInfo') {
+                console.log(`Searching for flights from ${from} to ${to} departing on ${depart} and returning on ${returnDate}`);
+                const filters = {
+                    from,
+                    to,
+                    depart,
+                    returnDate
+                };
+                const data = await FlightApi.getFlightsByFilter(filters);
+                setFlights(data);
+            } else {
+                const data = await FlightApi.getFlightsByID(flightID);
+                setFlights(data);
+                console.log(`Searching for flight with ID: ${flightID}`);
+            }
+        } catch (error) {
+            console.error('Error fetching flights:', error);
+            setError('Failed to fetch flights. Please try again.');
         }
+        setIsLoading(false);
     };
+
 
     return (
         <Layout>
