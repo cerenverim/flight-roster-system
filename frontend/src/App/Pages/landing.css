@@ -42,10 +42,14 @@ body {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     text-align: center;
-    width: 800px; /* Sabit genişlik */
-    max-width: 100%; /* Ekran genişliğinden daha büyük olmamasını sağlar */
-    margin: auto; /* Merkezi hizalama */
+    width: 800px;
+    /* Sabit genişlik */
+    max-width: 100%;
+    /* Ekran genişliğinden daha büyük olmamasını sağlar */
+    margin: auto;
+    /* Merkezi hizalama */
 }
+
 .search-options {
     display: flex;
     justify-content: center;
@@ -56,21 +60,28 @@ body {
     margin: 0 20px;
 }
 
-.flight-info-fields, .form-field {
+.flight-info-fields,
+.form-field {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    width: 100%; /* Her form alanının genişliği */
+    width: 100%;
+    /* Her form alanının genişliği */
 }
 
 .form-field {
-    flex: 1; /* Tüm form alanlarının esnek ve eşit büyüklükte olmasını sağlar */
-    margin: 10px; /* Form alanları arasında biraz boşluk bırakır */
-    min-width: 180px; /* Çok daralmaları önler */
+    flex: 1;
+    /* Tüm form alanlarının esnek ve eşit büyüklükte olmasını sağlar */
+    margin: 10px;
+    /* Form alanları arasında biraz boşluk bırakır */
+    min-width: 180px;
+    /* Çok daralmaları önler */
 }
-.form-field input, .form-field label {
+
+.form-field input,
+.form-field label {
     width: 100%;
-     /* Label ve input'ların tam genişlik kullanmasını sağlar */
+    /* Label ve input'ların tam genişlik kullanmasını sağlar */
 }
 
 .form-field input {
@@ -78,14 +89,17 @@ body {
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-bottom: 10px; /* Input alanı ile buton arasında boşluk ekler */
+    margin-bottom: 10px;
+    /* Input alanı ile buton arasında boşluk ekler */
     align-self: flex-end;
 }
 
 .search-button {
-    width: 100%; /* Buton genişliği */
+    width: 100%;
+    /* Buton genişliği */
     padding: 15px;
-    margin-top: 20px; /* Buton üst boşluğu */
+    margin-top: 20px;
+    /* Buton üst boşluğu */
     background-color: #007bff;
     color: white;
     border: none;
@@ -96,16 +110,17 @@ body {
 .search-button:hover {
     background-color: #0056b3;
 }
+
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f4f8; /* Yedek arka plan rengi */
-    background-image: url('/Users/begumolcayto/Documents/GitHub/flight-roster-system/frontend/public/map.jpg'); /* Arka plan görselinin yolu */
-    background-size: cover; /* Görselin konteyneri tamamen kaplamasını sağlar */
-    background-position: center; /* Görselin merkezden hizalanmasını sağlar */
-    background-repeat: no-repeat; /* Görselin tekrar etmemesini sağlar */
+    background-color: #f0f4f8;
+    /* Yedek arka plan rengi */
+    background-size: cover;
+    /* Görselin konteyneri tamamen kaplamasını sağlar */
+    background-position: center;
+    /* Görselin merkezden hizalanmasını sağlar */
+    background-repeat: no-repeat;
+    /* Görselin tekrar etmemesini sağlar */
     margin: 0;
     padding: 0;
-    height: 100vh; /* Sayfanın tam ekran boyutunu almasını sağlar */
-    width: 100vw; /* Genişliği tam ekran yapar */
 }
-

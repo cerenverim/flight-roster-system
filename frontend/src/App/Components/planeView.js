@@ -327,7 +327,7 @@ function PlaneView({ type }) {
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: isBusinessSeat ? (passenger ? '#ffff00' : '#8d8d00') : (passenger ? '#c0c0c0' : '#ffffff'),
+                                    backgroundColor: isBusinessSeat ? (passenger ? '#8d8d00' : '#ffff00') : (passenger ? '#c0c0c0' : '#ffffff'),
                                 }}
                             >
 
@@ -355,7 +355,7 @@ function PlaneView({ type }) {
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: isBusinessSeat ? (passenger ? '#ffff00' : '#8d8d00') : (passenger ? '#c0c0c0' : '#ffffff'),
+                                    backgroundColor: isBusinessSeat ? (passenger ? '#8d8d00' : '#ffff00') : (passenger ? '#c0c0c0' : '#ffffff'),
                                 }}
                             >
                                 {passenger ? (
