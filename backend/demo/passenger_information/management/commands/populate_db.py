@@ -1,5 +1,6 @@
 import math
 import time
+import datetime
 from datetime import timedelta
 from math import log10
 from collections import OrderedDict
@@ -383,7 +384,7 @@ class Command(BaseCommand):
         flight_number = "FL{}{}".format("0" * (4 - (int(log10(flight_number_count)) + 1)), flight_number_count)
 
         flight_date = timezone.make_aware(self.round_to_nearest_15_minutes(fake.future_datetime()),
-                                          timezone=timezone.utc)
+                                          timezone=  datetime.timezone.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated
 
