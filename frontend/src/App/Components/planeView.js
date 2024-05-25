@@ -267,6 +267,17 @@ function PlaneView({ type }) {
             seatType: 'Economy',
             seat: '12'
         },
+        {
+            key: '8',
+            passengerId: 'W77304D849',
+            flightId: 'G45678H901',
+            name: 'Siobhan Cantu',
+            age: 29,
+            gender: 'Female',
+            nationality: 'Russian',
+            seatType: 'Economy',
+            seat: '24'
+        },
     ]);
 
     const [combinedPassengers, setCombinedPassengers] = useState([]);
@@ -316,12 +327,12 @@ function PlaneView({ type }) {
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: isBusinessSeat ? 'yellow' : 'white',
+                                    backgroundColor: isBusinessSeat ? (passenger ? '#ffff00' : '#8d8d00') : (passenger ? '#c0c0c0' : '#ffffff'),
                                 }}
                             >
 
                                 {passenger ? (
-                                    <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
+                                    <Tooltip title={passenger.passengers.map(p => `${p.name}, ${p.age}`).join('-')}>
                                         <SeatIcon />
                                     </Tooltip>
                                 ) : (
@@ -337,17 +348,18 @@ function PlaneView({ type }) {
                 <Space>
                     {row.slice(seatsPerSide).map((seat, seatIndex) => {
                         const passenger = combinedPassengers.find((passenger) => passenger.seat === seat.toString());
+
                         const isBusinessSeat = seat <= businessCount;
                         return (
                             <Card
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: isBusinessSeat ? 'yellow' : 'white',
+                                    backgroundColor: isBusinessSeat ? (passenger ? '#ffff00' : '#8d8d00') : (passenger ? '#c0c0c0' : '#ffffff'),
                                 }}
                             >
                                 {passenger ? (
-                                    <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
+                                    <Tooltip title={passenger.passengers.map(p => `${p.name}, ${p.age}`).join('-')}>
                                         <SeatIcon />
                                     </Tooltip>
                                 ) : (
@@ -391,11 +403,11 @@ function PlaneView({ type }) {
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: 'white',
+                                    backgroundColor: pilot ? '#005f95' : '#00a2ff',
                                 }}
                             >
                                 {pilot ? (
-                                    <Tooltip title={pilot.name}>
+                                    <Tooltip title={`${pilot.name}, ${pilot.age}`}>
                                         <SeatIcon />
                                     </Tooltip>
                                 ) : (
@@ -454,11 +466,11 @@ function PlaneView({ type }) {
                                 key={seatIndex}
                                 style={{
                                     textAlign: 'center',
-                                    backgroundColor: 'white',
+                                    backgroundColor: attendant ? '#824100' : '#ff7f00',
                                 }}
                             >
                                 {attendant ? (
-                                    <Tooltip title={attendant.name}>
+                                    <Tooltip title={`${attendant.name}, ${attendant.age}`}>
                                         <SeatIcon />
                                     </Tooltip>
                                 ) : (
