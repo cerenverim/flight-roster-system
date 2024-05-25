@@ -340,7 +340,7 @@ class Command(BaseCommand):
 
         airport_data = []
 
-        with open('airport_geodata.txt', 'r', encoding='utf-8') as file:
+        with open('./location/airport_geodata.txt', 'r', encoding='utf-8') as file:
             for line in file:
                 city, country, code, latitude, longitude = line.strip().split("_")
 
