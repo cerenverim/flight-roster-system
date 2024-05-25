@@ -1,8 +1,8 @@
 import { React, useState, useEffect, useRef } from "react";
-import { Tooltip, Row, Col, Card, Space } from "antd";
+import { Tooltip, Row, Col, Card, Space, Typography } from "antd";
 import Icon from '@ant-design/icons';
 function PlaneView({ type }) {
-    const seat = () => (<svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="40px" width="40px" version="1.1" id="Layer_1" viewBox="0 0 512 512" >
+    const seat = () => (<svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="35px" width="35px" version="1.1" id="Layer_1" viewBox="0 0 512 512" >
         <g transform="translate(1 1)">
             <g>
                 <g>
@@ -315,12 +315,11 @@ function PlaneView({ type }) {
                             <Card
                                 key={seatIndex}
                                 style={{
-                                    width: '100px',
                                     textAlign: 'center',
                                     backgroundColor: isBusinessSeat ? 'yellow' : 'white',
                                 }}
                             >
-                                <p>{seat}</p>
+
                                 {passenger ? (
                                     <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
                                         <SeatIcon />
@@ -330,6 +329,7 @@ function PlaneView({ type }) {
                                         <SeatIcon />
                                     </Tooltip>
                                 )}
+                                <p>{seat}</p>
                             </Card>
                         );
                     })}
@@ -340,13 +340,12 @@ function PlaneView({ type }) {
                         const isBusinessSeat = seat <= businessCount;
                         return (
                             <Card
+                                key={seatIndex}
                                 style={{
-                                    width: '100px',
                                     textAlign: 'center',
                                     backgroundColor: isBusinessSeat ? 'yellow' : 'white',
                                 }}
                             >
-                                <p>{seat}</p>
                                 {passenger ? (
                                     <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
                                         <SeatIcon />
@@ -356,6 +355,7 @@ function PlaneView({ type }) {
                                         <SeatIcon />
                                     </Tooltip>
                                 )}
+                                <p>{seat}</p>
                             </Card>
                         );
                     })}
@@ -390,7 +390,6 @@ function PlaneView({ type }) {
                             <Card
                                 key={seatIndex}
                                 style={{
-                                    width: '100px',
                                     textAlign: 'center',
                                     backgroundColor: 'white',
                                 }}
@@ -454,7 +453,6 @@ function PlaneView({ type }) {
                             <Card
                                 key={seatIndex}
                                 style={{
-                                    width: '100px',
                                     textAlign: 'center',
                                     backgroundColor: 'white',
                                 }}
@@ -480,23 +478,32 @@ function PlaneView({ type }) {
     return (
         <>
             {type === 1 ? (
-                <>
-                    <>{generateRowsFlight(2)}</>
-                    <>{generateRowsCabin(6)}</>
-                    <>{generateRowsPassenger(10, 1, 20)}</>
-                </>
+                <Space key="type-1" direction="vertical" style={{ width: '60%', margin: '0px 50px ' }}>
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Flight Crew</Typography.Title>
+                    {generateRowsFlight(2)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Cabin Crew</Typography.Title>
+                    {generateRowsCabin(6)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
+                    {generateRowsPassenger(10, 1, 20)}
+                </Space>
             ) : type === 2 ? (
-                <>
-                    <>{generateRowsFlight(4)}</>
-                    <>{generateRowsCabin(12)}</>
-                    <>{generateRowsPassenger(20, 2, 20)}</>
-                </>
+                <Space key="type-2" direction="vertical" style={{ width: '60%', margin: '0px 50px ' }}>
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Flight Crew</Typography.Title>
+                    {generateRowsFlight(4)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Cabin Crew</Typography.Title>
+                    {generateRowsCabin(12)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
+                    {generateRowsPassenger(20, 2, 20)}
+                </Space>
             ) : (
-                <>
-                    <>{generateRowsFlight(8)}</>
-                    <>{generateRowsCabin(20)}</>
-                    <>{generateRowsPassenger(30, 3, 60)}</>
-                </>
+                <Space key="type-3" direction="vertical" style={{ width: '60%', margin: '0px 50px ' }}>
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Flight Crew</Typography.Title>
+                    {generateRowsFlight(8)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Cabin Crew</Typography.Title>
+                    {generateRowsCabin(20)}
+                    <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
+                    {generateRowsPassenger(30, 3, 60)}
+                </Space>
             )}
         </>
     );
