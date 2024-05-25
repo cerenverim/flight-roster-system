@@ -81,7 +81,7 @@ class CrewTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_crew_by_vehicle_type_nonexistant(self):
-        url = '/api/cabin_api/crew/9/'
+        url = '/api/cabin_api/crew/99/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)

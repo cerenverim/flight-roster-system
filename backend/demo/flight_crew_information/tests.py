@@ -71,7 +71,7 @@ class PilotTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_pilot_by_vehicle_type_nonexistant(self):
-        url = '/api/pilot_api/pilots/9/'
+        url = '/api/pilot_api/pilots/99/'
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
