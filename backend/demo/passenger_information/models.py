@@ -12,7 +12,8 @@ class Passenger(models.Model):
     seat_no = models.IntegerField(blank=True, null=True)
     seat_type = models.IntegerField()  # 0 - Economy, 1 - Business
     # If age 0-2, this is parent info. If not, this is affiliated passenger
-    affiliated_passenger = models.ManyToManyField('self')
+    affiliated_passenger = models.ManyToManyField('self', blank=True)
+
 
 class PlacedPassenger(models.Model):
     passenger = models.OneToOneField(Passenger, on_delete=models.PROTECT)

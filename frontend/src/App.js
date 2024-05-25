@@ -31,6 +31,8 @@ function App() {
         <Route path="/manualSelection" element={<ManualSelectionPage />} />
         <Route path="/flightSelection" element={<FlightSelectionPage />} />
         <Route path="/userProfile" element={<UserProfilePage />} />
+        <Route path="*" element={<LandingPage />} />
+
       </Routes>
     </div>
   );

@@ -15,6 +15,7 @@ body {
     border-radius: 8px; /* Border radius'u artırdık */
     background-color: #fff;
     text-align: center;
+    align-self: flex-start;
 }
 
 .signup-container h2 {
