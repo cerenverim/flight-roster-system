@@ -14,7 +14,7 @@ class ListFlightsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
+        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type').order_by('flight_number')
         serializer = FlightSerializer(flights, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
