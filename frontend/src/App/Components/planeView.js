@@ -282,7 +282,7 @@ function PlaneView({ type }) {
         setCombinedPassengers(combined);
     }, [passengers]);
 
-    const generateRows = (rowCount, seatsPerSide) => {
+    const generateRowsPassenger = (rowCount, seatsPerSide, businessCount) => {
         const rows = [];
 
         let seatNumber = 1;
@@ -299,12 +299,22 @@ function PlaneView({ type }) {
                 <Space>
                     {row.slice(0, seatsPerSide).map((seat, seatIndex) => {
                         const passenger = combinedPassengers.find((passenger) => passenger.seat === seat.toString());
+                        const isBusinessSeat = seat <= businessCount;
                         return (
-                            <Card key={seatIndex} style={{ width: '100px', textAlign: 'center' }}>
+                            <Card
+                                key={seatIndex}
+                                style={{
+                                    width: '100px',
+                                    textAlign: 'center',
+                                    backgroundColor: isBusinessSeat ? 'yellow' : 'white',
+                                }}
+                            >
                                 <p>{seat}</p>
                                 {passenger && (
                                     <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
-                                        <p>{passenger.passengers.length} {passenger.passengers.length > 1 ? 'passengers' : 'passenger'}</p>
+                                        <p>
+                                            {passenger.passengers.length} {passenger.passengers.length > 1 ? 'passengers' : 'passenger'}
+                                        </p>
                                     </Tooltip>
                                 )}
                             </Card>
@@ -314,12 +324,21 @@ function PlaneView({ type }) {
                 <Space>
                     {row.slice(seatsPerSide).map((seat, seatIndex) => {
                         const passenger = combinedPassengers.find((passenger) => passenger.seat === seat.toString());
+                        const isBusinessSeat = seat <= businessCount;
                         return (
-                            <Card key={seatIndex} style={{ width: '100px', textAlign: 'center' }}>
+                            <Card
+                                style={{
+                                    width: '100px',
+                                    textAlign: 'center',
+                                    backgroundColor: isBusinessSeat ? 'yellow' : 'white',
+                                }}
+                            >
                                 <p>{seat}</p>
                                 {passenger && (
                                     <Tooltip title={passenger.passengers.map((p) => p.name).join(', ')}>
-                                        <p>{passenger.passengers.length} {passenger.passengers.length > 1 ? 'passengers' : 'passenger'}</p>
+                                        <p>
+                                            {passenger.passengers.length} {passenger.passengers.length > 1 ? 'passengers' : 'passenger'}
+                                        </p>
                                     </Tooltip>
                                 )}
                             </Card>
@@ -329,19 +348,88 @@ function PlaneView({ type }) {
             </Space>
         ));
     };
+    const generateRowsFlight = (pilotCount) => {
+        const rows = [];
+        if (pilotCount === 2 || pilotCount === 4) {
+            const rowSeats = [];
+            for (let j = 0; j < pilotCount; j++) {
+                rowSeats.push(j);
+            }
+            rows.push(rowSeats);
+        }
+        else {
+            for (let i = 0; i < 2; i++) {
+                const rowSeats = [];
+                for (let j = i * 4; j < i * 4 + 4; j++) {
+                    rowSeats.push(j);
+                }
+                rows.push(rowSeats);
+            }
+        }
+        return rows.map((row, rowIndex) => (
+            <Space key={rowIndex} style={{ display: 'flex', justifyContent: 'space-evenly', marginBottom: '10px' }}>
+                <Space>
+                    {row.map((seat, seatIndex) => {
+                        const pilot = flightCrew[seat];
+                        return (
+                            <Card
+                                key={seatIndex}
+                                style={{
+                                    width: '100px',
+                                    textAlign: 'center',
+                                    backgroundColor: 'white',
+                                }}
+                            >
+                                {pilot ? (
+                                    <>
+                                        <p>{pilot.name}</p>
+                                        <p>{pilot.vehicleType}</p>
+                                        <p>{pilot.range}</p>
+                                    </>
+                                ) : (
+                                    <p>No pilot assigned</p>
+                                )}
+                            </Card>
+                        );
+                    })}
+                </Space>
+            </Space>
+        ));
+    }
+    const generateRowsCabin = (attendantCount) => {
+        if (attendantCount === 6) {
 
+        }
+        else if (attendantCount === 12) {
 
+        }
+        else {
 
+        }
+
+    }
 
 
     return (
         <>
             {type === 1 ? (
-                <>{generateRows(10, 1)}</>
+                <>
+                    <>{generateRowsFlight(2)}</>
+                    <>{generateRowsCabin(6)}</>
+                    <>{generateRowsPassenger(10, 1, 20)}</>
+                </>
             ) : type === 2 ? (
-                <>{generateRows(20, 2)}</>
+                <>
+                    <>{generateRowsFlight(4)}</>
+                    <>{generateRowsCabin(12)}</>
+                    <>{generateRowsPassenger(20, 2, 20)}</>
+                </>
             ) : (
-                <>{generateRows(30, 3)}</>
+                <>
+                    <>{generateRowsFlight(8)}</>
+                    <>{generateRowsCabin(20)}</>
+                    <>{generateRowsPassenger(30, 3, 60)}</>
+                </>
             )}
         </>
     );
