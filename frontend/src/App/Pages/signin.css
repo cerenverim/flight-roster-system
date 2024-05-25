@@ -89,3 +89,8 @@ body {
     font-size: 1.2em;
     margin-bottom: 15px; /* Bu satır eklendi, buton ile kayıt bağlantısı arasındaki mesafeyi artırdı */
 }
+.error-message {
+    color: red; 
+    margin-top: 10px; 
+}
+

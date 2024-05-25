@@ -1,15 +1,24 @@
 import React, { useState } from 'react';
 import './landing.css';
+import { FlightApi } from '../APIs/FlightApi';
+import FlightCard  from '../Components/flightCard';
 
 function LandingPage() {
+
+
     const [searchType, setSearchType] = useState('flightID');
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
     const [depart, setDepart] = useState('');
     const [returnDate, setReturnDate] = useState('');
     const [flightID, setFlightID] = useState('');
+    const [flights, setFlights] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
 
     const handleSearchTypeChange = (event) => {
+        setFlights([]);
         setSearchType(event.target.value);
     };
 
@@ -17,18 +26,37 @@ function LandingPage() {
         setter(event.target.value);
     };
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        if (searchType === 'flightInfo') {
-            console.log(`Searching for flights from ${from} to ${to} departing on ${depart} and returning on ${returnDate}`);
-        } else {
-            console.log(`Searching for flight with ID: ${flightID}`);
+        setIsLoading(true);
+        setError('');
+        try {
+            if (searchType === 'flightInfo') {
+                console.log(`Searching for flights from ${from} to ${to} departing on ${depart} and returning on ${returnDate}`);
+                const filters = {
+                    from,
+                    to,
+                    depart,
+                    returnDate
+                };
+                const data = await FlightApi.getFlightsByFilter(filters);
+                setFlights(data);
+            } else {
+                const data = await FlightApi.getFlightsByID(flightID);
+                setFlights(data);
+                console.log(`Searching for flight with ID: ${flightID}`);
+            }
+        } catch (error) {
+            console.error('Error fetching flights:', error);
+            setError('Failed to fetch flights. Please try again.');
         }
+        setIsLoading(false);
     };
+
 
     return (
         <div className="landing-container">
-            
+
             <form className="search-form" onSubmit={handleSubmit}>
                 <div className="search-options">
                     <label>
@@ -81,7 +109,7 @@ function LandingPage() {
                                 <i className="fas fa-calendar-alt"></i> Depart
                             </label>
                             <input
-                                type="text"
+                                type="date"
                                 id="depart"
                                 placeholder="DD/MM/YYYY"
                                 value={depart}
@@ -93,9 +121,9 @@ function LandingPage() {
                                 <i className="fas fa-calendar-alt"></i> Return
                             </label>
                             <input
-                                type="text"
+                                type="date"
                                 id="return"
-                                placeholder="DD/MM/YYYY"
+                                placeholder=''
                                 value={returnDate}
                                 onChange={handleInputChange(setReturnDate)}
                             />
@@ -117,6 +145,24 @@ function LandingPage() {
                 )}
                 <button type="submit" className="search-button"><i className="fas fa-search"></i> Search</button>
             </form>
+            <div className="flight-results">
+                {isLoading ? (
+                    <p>Loading...</p>
+                ) : error ? (
+                    <p className="error">{error}</p>
+                ) : (
+                    flights.length > 0 ? (
+                        <ul className="flight-card-list"> 
+                            {flights.map(flight => (
+                                <FlightCard flight={flight} />
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No flights found.</p>
+                    )
+                )}
+            </div>
+
         </div>
     );
 }

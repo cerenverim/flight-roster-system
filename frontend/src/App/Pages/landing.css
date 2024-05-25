@@ -1,8 +1,14 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f4f8;
+    background-image: url('../../../public/map.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     margin: 0;
     padding: 0;
+    height: 100vh;
+    width: 100vw;
 }
 
 .landing-container {
@@ -23,16 +29,17 @@ body {
     margin: 0;
 }
 
-.user-button {
+.user-button, .search-button {
     background-color: #0056b3;
     border: none;
     color: white;
     padding: 10px 20px;
     cursor: pointer;
     border-radius: 4px;
+    transition: background-color 0.3s ease;
 }
 
-.user-button:hover {
+.user-button:hover, .search-button:hover {
     background-color: #003f7f;
 }
 
@@ -41,11 +48,11 @@ body {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
-    text-align: center;
-    width: 800px; /* Sabit genişlik */
-    max-width: 100%; /* Ekran genişliğinden daha büyük olmamasını sağlar */
-    margin: auto; /* Merkezi hizalama */
+    width: 800px;
+    max-width: 100%;
+    margin: auto;
 }
+
 .search-options {
     display: flex;
     justify-content: center;
@@ -60,52 +67,65 @@ body {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
-    width: 100%; /* Her form alanının genişliği */
 }
 
 .form-field {
-    flex: 1; /* Tüm form alanlarının esnek ve eşit büyüklükte olmasını sağlar */
-    margin: 10px; /* Form alanları arasında biraz boşluk bırakır */
-    min-width: 180px; /* Çok daralmaları önler */
+    flex: 1;
+    margin: 10px;
+    min-width: 180px;
 }
+
 .form-field input, .form-field label {
     width: 100%;
-     /* Label ve input'ların tam genişlik kullanmasını sağlar */
 }
 
 .form-field input {
-    width: calc(100% - 20px);
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    margin-bottom: 10px; /* Input alanı ile buton arasında boşluk ekler */
-    align-self: flex-end;
+    margin-bottom: 10px;
+}
+.flight-card-list{
+    display: inline-block;
+    align-self: center;
 }
 
-.search-button {
-    width: 100%; /* Buton genişliği */
-    padding: 15px;
-    margin-top: 20px; /* Buton üst boşluğu */
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
+.flight-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 20px;
+    width: 800px;
 }
 
-.search-button:hover {
-    background-color: #0056b3;
-}
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f0f4f8; /* Yedek arka plan rengi */
-    background-image: url('/Users/begumolcayto/Documents/GitHub/flight-roster-system/frontend/public/map.jpg'); /* Arka plan görselinin yolu */
-    background-size: cover; /* Görselin konteyneri tamamen kaplamasını sağlar */
-    background-position: center; /* Görselin merkezden hizalanmasını sağlar */
-    background-repeat: no-repeat; /* Görselin tekrar etmemesini sağlar */
-    margin: 0;
-    padding: 0;
-    height: 100vh; /* Sayfanın tam ekran boyutunu almasını sağlar */
-    width: 100vw; /* Genişliği tam ekran yapar */
+.flight-card h2 {
+    color: #333;
+    font-size: 20px;
+    margin-bottom: 10px;
 }
 
+.flight-card .flight-details,
+.flight-card .additional-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.flight-card .flight-details span,
+.flight-card .additional-details span {
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    padding: 5px;
+    text-align: center;
+}
+
+.shared-flight-info {
+    background-color: #e7f5ff;
+    border-left: 5px solid #2196f3;
+    padding: 10px;
+    margin-bottom: 15px;
+    font-style: italic;
+}
