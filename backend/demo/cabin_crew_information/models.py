@@ -15,7 +15,7 @@ class CabinCrew(models.Model):
 
     seniority = models.IntegerField() # 0 - Chef, 1 - Junior, 2 - Senior
     vehicle = models.ManyToManyField("flight_information.VehicleType")
-    dishes = models.ManyToManyField(Dish)
+    dishes = models.ManyToManyField(Dish, blank=True)
 
 
 
