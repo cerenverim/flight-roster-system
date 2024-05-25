@@ -5,9 +5,9 @@ from math import log10
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
-from django.utils import timezone 
-import datetime as dt 
 
+from django.utils import timezone
+from datetime import timezone as tz
 
 from faker import Faker
 from faker_food import FoodProvider
@@ -385,7 +385,8 @@ class Command(BaseCommand):
         flight_number = "FL{}{}".format("0" * (4 - (int(log10(flight_number_count)) + 1)), flight_number_count)
 
         flight_date = timezone.make_aware(self.round_to_nearest_15_minutes(fake.future_datetime()),
-                                          timezone=dt.timezone.utc)
+
+                                          timezone=tz.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated
 
@@ -501,7 +502,7 @@ class Command(BaseCommand):
             passenger.flight_id = flight.flight_number
             passenger.save()
 
-        random_passengers = passengers[:len(passengers)]
+        random_passengers = passengers[:len(passengers) // 2]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
 
         # assign seats for plane
