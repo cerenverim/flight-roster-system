@@ -5,9 +5,9 @@ const getFlightsByID = async (flightNumber) => {
         // Fetch all flights
         const response = await baseServiceApi.get('/flights_api/flights');
         console.log(response);
-        
+
         // Filter flights based on flightNumber provided
-        if(flightNumber !== "") {
+        if (flightNumber !== "") {
             const filteredFlights = response.data.filter(flight => flight.flight_number === flightNumber);
             console.log(filteredFlights);
             return filteredFlights;
@@ -33,9 +33,9 @@ const getFlightsByFilter = async (filters) => {
         const filteredFlights = allFlights.filter(flight => {
             // Check each filter criteria; return true if flight matches all non-empty filter fields
             return (!filters.from || flight.flight_src === filters.from) &&
-                   (!filters.to || flight.flight_dest === filters.to) &&
-                   (!filters.depart || new Date(flight.flight_date).toDateString() === new Date(filters.depart).toDateString()) &&
-                   (!filters.returnDate || (flight.return_date && new Date(flight.return_date).toDateString() === new Date(filters.returnDate).toDateString()));
+                (!filters.to || flight.flight_dest === filters.to) &&
+                (!filters.depart || new Date(flight.flight_date).toDateString() === new Date(filters.depart).toDateString()) &&
+                (!filters.returnDate || (flight.return_date && new Date(flight.return_date).toDateString() === new Date(filters.returnDate).toDateString()));
         });
 
         return filteredFlights;

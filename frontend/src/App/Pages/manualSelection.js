@@ -2,168 +2,57 @@ import React, { useEffect, useState } from 'react';
 import { Table, Input, Button, Popconfirm, Form, Tag, Space, Layout, Typography } from 'antd';
 import AppHeader from '../Components/appHeader';
 import FlightSummary from '../Components/flightSummary';
+import { PilotApi } from '../APIs/PilotApi';
+import { CabinCrewApi } from '../APIs/CabinApi';
 const { Header, Content } = Layout;
-function ManualSelectionPage() {
+function ManualSelectionPage({ type }) {
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
-        {
-            key: '0',
-            id: 'A78534B219',
-            name: 'Marcus Giles',
-            age: 25,
-            gender: 'Male',
-            nationality: 'French',
-            languages: 'English',
-            vehicleType: 'A',
-            range: '1000km',
-            seniorityLevel: 'Junior'
-        },
-        {
-            key: '1',
-            id: 'J78214G911',
-            name: 'Leyton Christensen',
-            age: 30,
-            gender: 'Male',
-            nationality: 'English',
-            languages: 'English',
-            vehicleType: 'A',
-            range: '600km',
-            seniorityLevel: 'Senior'
-        },
-        {
-            key: '2',
-            id: 'C71234F439',
-            name: 'Viktoria Atkins',
-            age: 21,
-            gender: 'Female',
-            nationality: 'English',
-            languages: 'English, French',
-            vehicleType: 'A',
-            range: '1000km',
-            seniorityLevel: 'Trainee'
-        },
-        {
-            key: '3',
-            id: 'K71284G243',
-            name: 'Zubair Rodriguez',
-            age: 35,
-            gender: 'Male',
-            nationality: 'German',
-            languages: 'English, German',
-            vehicleType: 'A',
-            range: '1000km',
-            seniorityLevel: 'Senior'
-        },
 
     ]);
-    const [dataSourceFlight, setDataSourceFlight] = useState([
-        {
-            key: '1',
-            id: 'Y74834B283',
-            name: 'Rowan Barron',
-            age: 26,
-            gender: 'Male',
-            nationality: 'French',
-            languages: 'English, French',
-            vehicleType: 'A,B',
-            range: '1000km',
-            seniorityLevel: 'Trainee'
-        },
-        {
-            key: '2',
-            id: 'W77304D849',
-            name: 'Siobhan Cantu',
-            age: 29,
-            gender: 'Female',
-            nationality: 'Russian',
-            languages: 'English,Russian',
-            vehicleType: 'C',
-            range: '400km',
-            seniorityLevel: 'Trainee'
-        }
-    ]);
+    const [dataSourceFlight, setDataSourceFlight] = useState([]);
     const [dataSourceSelectionCabin, setDataSourceSelectionCabin] = useState([
-        {
-            key: '0',
-            id: 'A78534B219',
-            name: 'Marcus Giles',
-            age: 25,
-            gender: 'Male',
-            nationality: 'French',
-            languages: 'English',
-            attendantType: 'Regular',
-            vehicleType: 'A',
-            dishes: '',
-            seniorityLevel: 'Junior'
-        },
-        {
-            key: '1',
-            id: 'J78214G911',
-            name: 'Leyton Christensen',
-            age: 30,
-            gender: 'Male',
-            nationality: 'English',
-            languages: 'English',
-            attendantType: 'Regular',
-            vehicleType: 'A',
-            dishes: '',
-            seniorityLevel: 'Senior'
-        },
-        {
-            key: '2',
-            id: 'C71234F439',
-            name: 'Viktoria Atkins',
-            age: 21,
-            gender: 'Female',
-            nationality: 'English',
-            languages: 'English, French',
-            attendantType: 'Regular',
-            vehicleType: 'A',
-            dishes: '',
-            seniorityLevel: 'Junior'
-        },
-        {
-            key: '3',
-            id: 'K71284G243',
-            name: 'Zubair Rodriguez',
-            age: 35,
-            gender: 'Male',
-            nationality: 'German',
-            languages: 'English, German',
-            attendantType: 'Chief',
-            vehicleType: 'A',
-            dishes: '',
-            seniorityLevel: 'Senior'
-        },
 
     ]);
     const [dataSourceCabin, setDataSourceCabin] = useState([
-        {
-            key: '4',
-            id: 'Y74834B283',
-            name: 'Rowan Barron',
-            age: 26,
-            gender: 'Male',
-            nationality: 'French',
-            languages: 'English, French',
-            attendantType: 'Chef',
-            vehicleType: 'A,B',
-            dishes: 'Creme Brulee',
-            seniorityLevel: 'Trainee'
-        },
-        {
-            key: '5',
-            id: 'W77304D849',
-            name: 'Siobhan Cantu',
-            age: 29,
-            gender: 'Female',
-            nationality: 'Russian',
-            languages: 'English,Russian',
-            attendantType: 'Chef',
-            vehicleType: 'C',
-            dishes: 'Lava Cake',
-            seniorityLevel: 'Senior'
-        }
     ]);
+    useEffect(() => {
+        let flightCrew;
+        PilotApi.getFlightCrew(6).then((response) => {
+            console.log(response.data);
+            flightCrew = response.data.map((item) => ({
+                "key": item.id,
+                "id": item.id,
+                "name": item.name,
+                "nationality": item.nationality,
+                "vehicleType": item.vehicle,
+                "languages": (item.languages.map((language) => language)).join(', '),
+                "age": item.age,
+                "gender": item.gender,
+                "seniorityLevel": item.seniority === 0 ? 'Trainee' : (item.seniority === 1 ? 'Junior' : 'Senior'),
+                "range": item.max_range + ' km',
+            }));
+            setDataSourceSelectionFlight(flightCrew);
+        });
+
+        let cabinCrew;
+        CabinCrewApi.getCabinCrew(6).then((response) => {
+            cabinCrew = response.data.map((item) => ({
+                "key": item.id,
+                "id": item.id,
+                "name": item.name,
+                "nationality": item.nationality,
+                "vehicleType": (item.vehicle.map((vehicles) => vehicles)).join(', '),
+                "dishes": (item.dishes.map((dishes) => dishes.dish)).join(', '),
+                "languages": (item.languages.map((language) => language)).join(', '),
+                "age": item.age,
+                "gender": item.gender,
+                "seniorityLevel": item.seniority === 0 ? '' : (item.seniority === 1 ? 'Junior' : 'Senior'),
+                "attendantType": item.seniority === 0 ? 'Chef' : (item.seniority === 1 ? 'Regular' : 'Chief'),
+            }));
+            setDataSourceSelectionCabin(cabinCrew);
+        });
+
+    }, []);
     function generateUniqueKey(dataSource) {
         // Generate a unique key based on current dataSource keys
         let newKey = 0;
@@ -172,10 +61,6 @@ function ManualSelectionPage() {
         }
         return newKey.toString();
     };
-    const [countSelectionFlight, setCountSelectionFlight] = useState(2);
-    const [countFlight, setCountFlight] = useState(2);
-    const [countSelectionCabin, setCountSelectionCabin] = useState(2);
-    const [countCabin, setCountCabin] = useState(2);
     const handleAddFlight = (key) => {
         const deletedData = dataSourceSelectionFlight.find((item) => item.key === key);
         const newData = dataSourceSelectionFlight.filter((item) => item.key !== key);
@@ -183,7 +68,6 @@ function ManualSelectionPage() {
         const addedData = { ...deletedData, key: newKey };
         setDataSourceFlight([...dataSourceFlight, addedData]);
         setDataSourceSelectionFlight(newData);
-        setCountFlight(countFlight + 1);
     };
     const handleDeleteFlight = (key) => {
         const deletedData = dataSourceFlight.find((item) => item.key === key);
@@ -192,7 +76,6 @@ function ManualSelectionPage() {
         const addedData = { ...deletedData, key: newKey };
         setDataSourceSelectionFlight([...dataSourceSelectionFlight, addedData]);
         setDataSourceFlight(newData);
-        setCountSelectionFlight(countSelectionFlight + 1);
     };
     const handleAddCabin = (key) => {
         const deletedData = dataSourceSelectionCabin.find((item) => item.key === key);
@@ -201,7 +84,6 @@ function ManualSelectionPage() {
         const addedData = { ...deletedData, key: newKey };
         setDataSourceCabin([...dataSourceCabin, addedData]);
         setDataSourceSelectionCabin(newData);
-        setCountCabin(countCabin + 1);
     };
     const handleDeleteCabin = (key) => {
         const deletedData = dataSourceCabin.find((item) => item.key === key);
@@ -210,7 +92,6 @@ function ManualSelectionPage() {
         const addedData = { ...deletedData, key: newKey };
         setDataSourceSelectionCabin([...dataSourceSelectionCabin, addedData]);
         setDataSourceCabin(newData);
-        setCountSelectionCabin(countSelectionCabin + 1);
     };
     const FlightSelectionColumns = [
         {
