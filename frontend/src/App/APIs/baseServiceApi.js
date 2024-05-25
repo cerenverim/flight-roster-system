@@ -7,4 +7,15 @@ const baseServiceApi = axios.create({
     }
 });
 
+export const setAuthToken = token => {
+    console.log(token);
+    if (token) {
+        // Apply for every request
+        baseServiceApi.defaults.headers.common['Authorization'] = `token ${token}`;
+    } else {
+        // Delete auth header
+        delete baseServiceApi.defaults.headers.common['Authorization'];
+    }
+};
+
 export default baseServiceApi;

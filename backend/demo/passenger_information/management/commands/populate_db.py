@@ -5,6 +5,7 @@ from math import log10
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
+
 from django.utils import timezone
 from datetime import timezone as tz
 
@@ -384,6 +385,7 @@ class Command(BaseCommand):
         flight_number = "FL{}{}".format("0" * (4 - (int(log10(flight_number_count)) + 1)), flight_number_count)
 
         flight_date = timezone.make_aware(self.round_to_nearest_15_minutes(fake.future_datetime()),
+
                                           timezone=tz.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated

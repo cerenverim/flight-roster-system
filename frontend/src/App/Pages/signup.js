@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import './signup.css';
 import { Link, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser, setToken } from '../../actions/userActions';
+import { setAuthToken } from '../APIs/baseServiceApi';
 import { AuthApi } from '../APIs/AuthApi';
-import { useSelector, useDispatch } from 'react-redux';
-import { setUser } from '../../actions/userActions';
-
 
 function SignUpPage() {
     const [email, setEmail] = useState('');
@@ -12,31 +12,39 @@ function SignUpPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
-    
+    const [errorMessage, setErrorMessage] = useState(''); // Hata mesajları için state
+
     const navigate = useNavigate();
-    const user = useSelector(state => state.user.currentUser);
     const dispatch = useDispatch();
 
-    const updateUser = (newUser) => {
-        dispatch(setUser(newUser));
-    }
+    const handleSignUp = useCallback(async (userData) => {
+        if (password !== confirmPassword) {
+            setErrorMessage("Passwords do not match.");
+            return;
+        }
+        try {
+            const data = await AuthApi.signUp(userData);
+            dispatch(setUser(data.user));
+            dispatch(setToken(data.token));
+            setAuthToken(data.token);
+            navigate('/userProfile');
+        } catch (error) {
+            console.error('Error during sign up process:', error);
+            if (error.response && error.response.data) {
+                setErrorMessage(error.response.data.message || "User already exists.");
+            } else {
+                setErrorMessage("User already exists.");
+            }
+        }
+    }, [dispatch, navigate, password, confirmPassword]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        try {
-            const userData = {
-                username: email,
-                password: password
-            };;
-            const result = await AuthApi.signUp(userData);
-            console.log('Sign Up Success:', result);
-            updateUser(result.user);
-            navigate('/userProfile');
-            // Redirect or perform additional actions upon successful sign-up
-        } catch (error) {
-            // Handle sign-up errors, such as showing a notification to the user
-            console.log('Sign Up Failed:', error);
-        }
+        const userData = {
+            username: email,
+            password: password
+        };
+        await handleSignUp(userData);
     };
         
     const togglePasswordVisibility = () => {
@@ -92,6 +100,7 @@ function SignUpPage() {
                         </span>
                     </div>
                 </div>
+                {errorMessage && <div className="error-message">{errorMessage}</div>}
                 <button type="submit" className="btn">SIGN UP</button>
             </form>
             <p className="signin-link">
