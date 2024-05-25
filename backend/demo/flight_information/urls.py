@@ -4,4 +4,5 @@ from . import views
 urlpatterns = [
     path('flights/', views.ListFlightsView.as_view(), name='list_flights'),
     path('flights/<str:flight_number>/', views.FlightDetailsView.as_view(), name='flight_details'),
+    path('flights/<str:flight_id>/roster/', views.get_roster_by_flight, name='get_roster_by_flight'),
 ]
