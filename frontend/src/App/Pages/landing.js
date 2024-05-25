@@ -28,10 +28,7 @@ function LandingPage() {
 
     return (
         <div className="landing-container">
-            <header className="header">
-                <h1>HOME</h1>
-                <button className="user-button">USER</button>
-            </header>
+            
             <form className="search-form" onSubmit={handleSubmit}>
                 <div className="search-options">
                     <label>
