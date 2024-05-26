@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Space, Button, Tabs, Layout } from 'antd';
+import React from 'react';
+import { Space, Button, Tabs, Layout } from 'antd';
 import TabularView from '../Components/tabularView';
 import ExtendedView from '../Components/extendedView';
 import PlaneView from '../Components/planeView';

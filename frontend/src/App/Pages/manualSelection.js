@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Table, Input, Button, Popconfirm, Form, Tag, Space, Layout, Typography } from 'antd';
-import AppHeader from '../Components/appHeader';
+import { Table, Input, Button, Popconfirm, Space, Layout, Typography } from 'antd';
 import FlightSummary from '../Components/flightSummary';
 import { PilotApi } from '../APIs/PilotApi';
 import { CabinCrewApi } from '../APIs/CabinApi';
 import { SearchOutlined } from '@ant-design/icons';
-const { Header, Content } = Layout;
+const { Content } = Layout;
 function ManualSelectionPage({ type }) {
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
 

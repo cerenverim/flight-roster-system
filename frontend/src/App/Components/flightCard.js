@@ -1,6 +1,6 @@
 import React from 'react';
 
-function FlightCard({ flight }) {
+function FlightCard({ flight, onClick }) {
     // Helper function to format the date
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -8,7 +8,7 @@ function FlightCard({ flight }) {
     };
 
     return (
-        <div className="flight-card">
+        <div className="flight-card" onClick={() => onClick()}>
             <h2 className="flight-number">Flight Number: {flight.flight_number}</h2>
             {flight.shared_flight && (
                 <div className="shared-flight-info">

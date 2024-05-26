@@ -11,9 +11,9 @@ function AppHeader(props) {
     const [dropdownItems, setDropdownItems] = useState([]);
 
     const logout = useCallback(() => {
-        localStorage.removeItem('token'); // Remove the token from localStorage
+        localStorage.removeItem('token');  // Remove the token from localStorage
         dispatch({ type: 'LOGOUT' });
-        navigate('/signIn'); // Redirect to the sign-in page
+        navigate('/signIn');  // Redirect to the sign-in page
     }, [dispatch, navigate]);
 
     useEffect(() => {
@@ -37,7 +37,7 @@ function AppHeader(props) {
             padding: '0px 37px 0px 33px'
         }}>
             <Link to="/" style={{ color: '#0958d9', fontWeight: 'bold', fontSize: '27px' }}>HOME</Link>
-            <Dropdown menu={
+            <Dropdown overlay={
                 <Menu items={dropdownItems} onClick={(e) => e.domEvent.stopPropagation()} />
             } trigger={['click']}>
                 <a onClick={(e) => e.preventDefault()} style={{ display: 'flex', alignItems: 'center' }}>
