@@ -1,7 +1,7 @@
 import { React, useState, useEffect, useRef } from "react";
 import { Table, Input, Button, Tag, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-
+import FlightMenu from "./flightMenu";
 function TabularView() {
     const [dataSource, setDataSource] = useState([
         {
@@ -169,12 +169,17 @@ function TabularView() {
         },
     ];
     return (
-        <Table
-            scroll={{ x: true }}
-            bordered
-            dataSource={dataSource}
-            columns={defaultColumns}
-        />
+        <div style={{ height: '100%', width: '100%' }}>
+            <Table
+                scroll={{ x: true }}
+                bordered
+                dataSource={dataSource}
+                columns={defaultColumns}
+            />
+            <FlightMenu menu={menu} />
+        </div>
+
+
     );
 }
 

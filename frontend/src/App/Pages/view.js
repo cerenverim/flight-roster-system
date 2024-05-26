@@ -17,7 +17,7 @@ function ViewPage({ type }) {
         {
             key: '2',
             label: 'PLANE VIEW',
-            children: <PlaneView type={type} />,
+            children: <PlaneView type={2} />,
         },
         {
             key: '3',

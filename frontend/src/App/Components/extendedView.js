@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Table, Input, Button, Tag, Space, Row, Col, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-
+import FlightMenu from "./flightMenu";
 
 
 function ExtendedView() {
@@ -513,6 +513,11 @@ function ExtendedView() {
                         dataSource={passengerSource}
                         columns={passengerColumns}
                     />
+                </Col>
+            </Row>
+            <Row>
+                <Col span={24}>
+                    <FlightMenu menu={menu} />
                 </Col>
             </Row>
         </>
