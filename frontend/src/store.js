@@ -5,10 +5,12 @@ import { persistStore, persistReducer } from 'redux-persist';
 
 // Import your reducers here
 import userReducer from './reducers/userReducer';
+import flightReducer from './reducers/flightReducer';
 
 // Create a root reducer that will be wrapped by persistReducer
 const rootReducer = combineReducers({
     user: userReducer,
+    flight: flightReducer
     // you can add more reducers here
 });
 
