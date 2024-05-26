@@ -207,10 +207,10 @@ class Command(BaseCommand):
 
     def generate_database(self):
 
-        self.generate_passengers(2000)
+        self.generate_passengers(1200)
         self.load_vehicle_types()
-        self.generate_flightCrew(100)
-        self.generate_cabinCrew(700)
+        self.generate_flightCrew(50)
+        self.generate_cabinCrew(100)
         self.generate_Dish()
         self.load_airport_data()
         for flight_count in range(1, 11):
@@ -402,6 +402,8 @@ class Command(BaseCommand):
         location_src, location_dest = fake.random_elements(list(Location.objects.all()), length=2, unique=True)
 
         vehicle_type = random.choice(VehicleType.objects.all())
+        distance = random.randint(1000, 12000)
+        timeMins = distance * 12
 
         flight = Flight(flight_number=flight_number,
                         flight_roster=None,
@@ -410,8 +412,8 @@ class Command(BaseCommand):
                         flight_src=location_src,
 
                         flight_date=flight_date,
-                        flight_duration=timedelta(days=0, hours=0, minutes=0),
-                        flight_distance=0,
+                        flight_duration=timedelta(minutes=timeMins),
+                        flight_distance=distance,
 
                         flight_dest=location_dest,
 
