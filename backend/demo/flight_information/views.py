@@ -352,6 +352,117 @@ def auto_generate_roster(request, flight_number):
     serializer = RosterSerializer(roster)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+
+'''
+sample input 
+{
+    "roster_junior_pilot_ids": [101, 102],
+    "roster_senior_pilot_ids": [201],
+    "roster_trainee_ids": [301],
+    "roster_senior_cabin_ids": [401, 402],
+    "roster_junior_cabin_ids": [501, 502, 503, 504],
+    "roster_chef_ids": [601, 602]
+}
+'''
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def manuel_generate_roster(request, flight_number):
+    flight = get_object_or_404(Flight, flight_number=flight_number)
+    if flight.flight_roster != None:
+        return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
+
+    selected_vehicle = flight.vehicle_type
+    
+    data = request.data
+    roster_junior_pilot_ids = data.get('roster_junior_pilot_ids', [])
+    roster_senior_pilot_ids = data.get('roster_senior_pilot_ids', [])
+    roster_trainee_ids = data.get('roster_trainee_ids', [])
+    roster_senior_cabin_ids = data.get('roster_senior_cabin_ids', [])
+    roster_junior_cabin_ids = data.get('roster_junior_cabin_ids', [])
+    roster_chef_ids = data.get('roster_chef_ids', [])
+
+
+    all_ids = {
+        "roster_junior_pilot_ids": roster_junior_pilot_ids,
+        "roster_senior_pilot_ids": roster_senior_pilot_ids,
+        "roster_trainee_ids": roster_trainee_ids,
+        "roster_senior_cabin_ids": roster_senior_cabin_ids,
+        "roster_junior_cabin_ids": roster_junior_cabin_ids,
+        "roster_chef_ids": roster_chef_ids
+    }
+
+    for category, ids in all_ids.items():
+        if len(ids) != len(set(ids)):
+            return Response({"message": f"Provided {category} must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if len(roster_senior_pilot_ids) < 1 or len(roster_junior_pilot_ids) < 1:
+        return Response({"message": "There must be at least one senior and one junior pilot."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_trainee_ids) > 2:
+        return Response({"message": "At most two trainee pilots are allowed."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_senior_cabin_ids) < 1 or len(roster_senior_cabin_ids) > 4:
+        return Response({"message": "There must be between 1 and 4 senior cabin crew members."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_junior_cabin_ids) < 4 or len(roster_junior_cabin_ids) > 16:
+        return Response({"message": "There must be between 4 and 16 junior cabin crew members."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_chef_ids) > 2:
+        return Response({"message": "At most 2 chefs are allowed."}, status=status.HTTP_400_BAD_REQUEST),
+
+    all_pilot_ids = roster_junior_pilot_ids + roster_senior_pilot_ids + roster_trainee_ids
+    pilots = FlightCrew.objects.filter(id__in=all_pilot_ids)
+    for pilot in pilots:
+        if pilot.vehicle != selected_vehicle:
+            return Response({"message": f"Pilot {pilot.name} cannot operate the vehicle type {selected_vehicle.vehicle_name}."}, status=status.HTTP_400_BAD_REQUEST)
+
+    all_attendant_ids = roster_senior_cabin_ids + roster_junior_cabin_ids + roster_chef_ids
+    attendants = CabinCrew.objects.filter(id__in=all_attendant_ids)
+    for attendant in attendants:
+        if selected_vehicle not in attendant.vehicle.all():
+            return Response({"message": f"Attendant {attendant.name} cannot operate in the vehicle type {selected_vehicle.vehicle_name}."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    total_crew = len(roster_senior_cabin_ids) + len(roster_junior_cabin_ids) + len(roster_chef_ids)
+    if total_crew > selected_vehicle.vehicle_crew_capacity:
+        return Response({"message": f"Total number of cabin crew exceeds the vehicle capacity."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    flight_menu = []
+
+    chefs = CabinCrew.objects.filter(id__in=roster_chef_ids)
+    for chef in chefs:
+        for dish in chef.dishes.all():
+            flight_menu.append(dish)
+
+    flight_menu = list(set(flight_menu))
+
+    flight_menu_ids = [menu.id for menu in flight_menu]
+    roster_placed_passenger_ids = [passenger.id for passenger in placed_passengers]
+
+    roster = Roster()
+    roster.save()
+
+    roster.flight_crew_junior.set(roster_junior_pilot_ids)
+    roster.flight_crew_senior.set(roster_senior_pilot_ids)
+    roster.flight_crew_trainee.set(roster_trainee_ids)
+    roster.flight_cabin_crew_senior.set(roster_senior_cabin_ids)
+    roster.flight_cabin_crew_junior.set(roster_junior_cabin_ids)
+    roster.flight_cabin_crew_chef.set(roster_chef_ids)
+    roster.flight_passengers.set(roster_placed_passenger_ids)
+    roster.flight_menu.set(flight_menu_ids)
+    roster.save()
+
+    flight.flight_roster = roster
+
+    flight.save()
+
+    serializer = RosterSerializer(roster)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
