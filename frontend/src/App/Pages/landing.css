@@ -1,14 +1,11 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f0f4f8;
-    background-image: url('../../../public/map.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
     margin: 0;
     padding: 0;
-    height: 100vh;
-    width: 100vw;
 }
 
 .landing-container {
@@ -29,7 +26,8 @@ body {
     margin: 0;
 }
 
-.user-button, .search-button {
+.user-button,
+.search-button {
     background-color: #0056b3;
     border: none;
     color: white;
@@ -39,7 +37,8 @@ body {
     transition: background-color 0.3s ease;
 }
 
-.user-button:hover, .search-button:hover {
+.user-button:hover,
+.search-button:hover {
     background-color: #003f7f;
 }
 
@@ -63,7 +62,8 @@ body {
     margin: 0 20px;
 }
 
-.flight-info-fields, .form-field {
+.flight-info-fields,
+.form-field {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;
@@ -75,7 +75,8 @@ body {
     min-width: 180px;
 }
 
-.form-field input, .form-field label {
+.form-field input,
+.form-field label {
     width: 100%;
 }
 
@@ -85,7 +86,8 @@ body {
     border-radius: 4px;
     margin-bottom: 10px;
 }
-.flight-card-list{
+
+.flight-card-list {
     display: inline-block;
     align-self: center;
 }
@@ -94,7 +96,7 @@ body {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin: 20px;
     width: 800px;

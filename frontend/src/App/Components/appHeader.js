@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, Link } from 'react-router-dom';
 import { Row, Col, Space, Button, Tabs, Layout, Dropdown, } from 'antd';
 import { DownOutlined } from '@ant-design/icons';
-function AppHeader() {
+function AppHeader(props) {
     const items = [
         {
             key: '1',
@@ -28,7 +28,7 @@ function AppHeader() {
                 <a onClick={(e) => e.preventDefault()}>
                     <Space>
                         <DownOutlined />
-                        <Button type="primary" style={{ backgroundColor: '#0958d9' }}>USER</Button>
+                        <Button type="primary" style={{ backgroundColor: '#0958d9' }}>{props.username}</Button>
                     </Space>
                 </a>
             </Dropdown>

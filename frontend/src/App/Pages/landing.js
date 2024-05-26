@@ -154,7 +154,7 @@ function LandingPage() {
                     flights.length > 0 ? (
                         <ul className="flight-card-list"> 
                             {flights.map(flight => (
-                                <FlightCard flight={flight} />
+                                <FlightCard key= {flight.flight_number} flight={flight} />
                             ))}
                         </ul>
                     ) : (
