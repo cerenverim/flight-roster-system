@@ -22,7 +22,7 @@ function SignInPage() {
             dispatch(setUser(data.user));
             dispatch(setToken(data.token));
             setAuthToken(data.token);
-            navigate('/userProfile'); // Eğer login başarılıysa, kullanıcıyı yönlendir
+            navigate('/'); // Eğer login başarılıysa, kullanıcıyı yönlendir
             setIsLoading(false); // Yükleme bittiğinde
         } catch (error) {
             console.error('Error during login process:', error);
