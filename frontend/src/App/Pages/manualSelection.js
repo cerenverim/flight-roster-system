@@ -470,15 +470,6 @@ function ManualSelectionPage({ type }) {
     ];
     return (
         <Layout >
-            <Header style={{
-                backgroundColor: '#ebebeb',
-                paddingLeft: '15px',
-                paddingRight: '15px',
-                zIndex: 3,
-                boxShadow: "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)"
-            }}>
-                <AppHeader username='USER' />
-            </Header>
             <Content >
                 <FlightSummary departurePoint='Bengaluru (BLR)' departureDate='Mon, 14 Jun 2021' returnPoint='New Delhi (Del)' returnDate='Fri, 18 Jun 2021' />
                 <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>

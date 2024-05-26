@@ -7,19 +7,37 @@ import ViewPage from './App/Pages/view';
 import ManualSelectionPage from './App/Pages/manualSelection';
 import FlightSelectionPage from './App/Pages/flightSelection';
 import UserProfilePage from './App/Pages/userprofile';
+import { Layout } from 'antd';
+import AppHeader from './App/Components/appHeader';
+import { useSelector, useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 
+
+const { Header} = Layout;
 function App() {
+  const currentUser = useSelector(state => state.user.currentUser)
+  const dispatch = useDispatch();
+  useEffect(() => {
+      const token = localStorage.getItem('token');
+      console.log(token);
+      if (token) {
+          dispatch({ type: 'SET_TOKEN', payload: token });
+      }
+  }, [dispatch]);
   return (
     <div>
-      <nav className="navbar">
-        <Link to="/" className="nav-item">Landing</Link>
-        <Link to="/signIn" className="nav-item">Sign In</Link>
-        <Link to="/signUp" className="nav-item">Sign Up</Link>
-        <Link to="/view" className="nav-item">View</Link>
-        <Link to="/manualSelection" className="nav-item">Manual Selection</Link>
-        <Link to="/flightSelection" className="nav-item">Flight Selection</Link>
-        <Link to="/userProfile" className="nav-item">User Profile</Link>
-      </nav>
+      <Layout>
+        <Header style={{
+          backgroundColor: '#ebebeb',
+          paddingLeft: '15px',
+          paddingRight: '15px',
+          zIndex: 3,
+          boxShadow: "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)"
+        }}>
+          <AppHeader username={currentUser ? currentUser.username: 'Sign In / Sign Up'} />
+        </Header>
+      </Layout>
+
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/signIn" element={<SignInPage />} />
