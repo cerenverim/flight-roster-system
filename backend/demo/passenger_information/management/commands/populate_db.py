@@ -1,12 +1,13 @@
 import math
 import time
-import datetime
 from datetime import timedelta
 from math import log10
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand
+
 from django.utils import timezone
+from datetime import timezone as tz
 
 from faker import Faker
 from faker_food import FoodProvider
@@ -384,7 +385,8 @@ class Command(BaseCommand):
         flight_number = "FL{}{}".format("0" * (4 - (int(log10(flight_number_count)) + 1)), flight_number_count)
 
         flight_date = timezone.make_aware(self.round_to_nearest_15_minutes(fake.future_datetime()),
-                                          timezone=  datetime.timezone.utc)
+
+                                          timezone=tz.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated
 
@@ -500,19 +502,9 @@ class Command(BaseCommand):
             passenger.flight_id = flight.flight_number
             passenger.save()
 
-        random_passengers = random.sample(passengers, k=(len(passengers))//2)
+        random_passengers = passengers[:len(passengers) // 2]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
-
-        # assign seats for plane
-        for passenger, seat_number in zip(random_passengers, seat_number):
-
-            placed_passenger = PlacedPassenger(passenger=passenger,
-                                               seat_no=seat_number + 1)
-            placed_passenger.save()
-
-            passenger.seat_no = seat_number + 1
-            passenger.save()
-
+        
         for passenger in passengers:
 
             if passenger.age <= 2:
@@ -523,9 +515,10 @@ class Command(BaseCommand):
                     replaced_passenger_index = random.randrange(len(passengers))
 
                     # find passenger with no dependents and the same seat type
-                    while passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None \
-                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type != parent.seat_type \
-                            and passengers[replaced_passenger_index].affiliated_passenger.all().first().age < 18:
+                    while not (passengers[replaced_passenger_index].affiliated_passenger.all().first() is not None
+                               and passengers[replaced_passenger_index].affiliated_passenger.all().first().seat_type == parent.seat_type
+                               and passengers[replaced_passenger_index].affiliated_passenger.all().first().age >= 18):
+
                         replaced_passenger_index = random.randrange(len(passengers))
 
                     passengers[replaced_passenger_index].seat_no = None
@@ -536,13 +529,15 @@ class Command(BaseCommand):
 
                     passengers[replaced_passenger_index] = parent
 
-                    # remove seat assignment from other plane
-                    if PlacedPassenger.objects.all().filter(passenger=parent):
+                    parent.seat_no = None
+                    parent.flight_id = flight.flight_number
+                    parent.save()
+
+                    if PlacedPassenger.objects.all().filter(passenger=parent).first():
                         PlacedPassenger.objects.all().filter(passenger=parent).delete()
 
-                        parent.seat_no = None
-                        parent.flight_id = flight.flight_number
-                        parent.save()
+                if PlacedPassenger.objects.all().filter(passenger=parent).first():
+                    PlacedPassenger.objects.all().filter(passenger=parent).delete()
 
                 # give child seat to parent
                 parent.seat_no = passenger.seat_no
@@ -552,6 +547,11 @@ class Command(BaseCommand):
                 # child sits on parent
                 passenger.seat_no = None
                 passenger.save()
+
+                if parent.seat_no:
+                    parent_placement = PlacedPassenger(passenger=parent, seat_no=parent.seat_no)
+                    parent_placement.save()
+
 
     # not in use
     def generate_Roster(self, flight):

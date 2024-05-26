@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from flight_information.models import Flight, SharedFlightInfo
+from flight_information.models import Flight, SharedFlightInfo, Roster
+from passenger_information.serializers import PlacedPassengerSerializer
 
 
 class SharedFlightSerializer(serializers.ModelSerializer):
@@ -13,3 +14,11 @@ class FlightSerializer(serializers.ModelSerializer):
     class Meta:
         model = Flight
         fields = '__all__'
+
+class RosterSerializer(serializers.ModelSerializer):
+    flight_passengers = PlacedPassengerSerializer(many=True, read_only=True)
+    
+    class Meta:
+        model = Roster
+        fields = '__all__'
+        
