@@ -3,6 +3,8 @@ import './landing.css';
 import { FlightApi } from '../APIs/FlightApi';
 import FlightCard from '../Components/flightCard';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setFlight, setRoster } from '../../actions/flightActions';
 
 function LandingPage() {
     const [searchType, setSearchType] = useState('flightID');
@@ -16,14 +18,24 @@ function LandingPage() {
     const [error, setError] = useState('');
     const [selectedFlight, setSelectedFlight] = useState(null);
     const [rosterType, setRosterType] = useState('automatically');
+
     const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+
 
     const handleFlightSelect = (flight) => {
         setSelectedFlight(selectedFlight === flight ? null : flight);
     };
 
     const handleContinue = () => {
-        navigate('/nextPage', { state: { rosterType, flight: selectedFlight } });
+        dispatch(setFlight(selectedFlight));
+        dispatch(setRoster(rosterType));
+        if(rosterType === 'automatically') {
+            navigate('/view');
+        } else {
+            navigate('/manualSelection');
+        }
     };
 
     const handleSearchTypeChange = (event) => {

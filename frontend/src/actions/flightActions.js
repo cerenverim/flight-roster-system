@@ -1,12 +1,12 @@
-export const setSelectedFlight = (flight) => {
+export const setFlight = (flight) => {
     return {
-        type: 'SET_SELECTED_FLIGHT',
+        type: 'SET_FLIGHT',
         payload: flight
     };
 };
-export const setRosterType = (rosterType) => {
+export const setRoster = (rosterType) => {
     return {
-        type: 'SET_ROSTER_TYPE',
+        type: 'SET_ROSTER',
         payload: rosterType
     };
 };

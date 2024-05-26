@@ -5,12 +5,12 @@ const initialState = {
 
 const flightReducer = (state = initialState, action) => {
     switch (action.type) {
-        case 'SET_SELECTED_FLIGHT':
+        case 'SET_FLIGHT':
             return {
                 ...state,
                 selectedFlight: action.payload
             };
-        case 'SET_ROSTER_TYPE':
+        case 'SET_ROSTER':
             return {
                 ...state,
                 rosterType: action.payload
