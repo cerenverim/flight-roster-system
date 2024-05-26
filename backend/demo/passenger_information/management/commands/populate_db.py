@@ -504,6 +504,14 @@ class Command(BaseCommand):
 
         random_passengers = passengers[:len(passengers) // 2]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
+
+        # assign seats for plane
+        for passenger, seat_number in zip(random_passengers, seat_number):
+            placed_passenger = PlacedPassenger(passenger=passenger,seat_no=seat_number + 1)
+            placed_passenger.save()
+            passenger.seat_no = seat_number + 1
+            passenger.save()
+
         
         for passenger in passengers:
 
