@@ -1,3 +1,6 @@
+from io import StringIO
+
+from django.core.management import call_command
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
@@ -15,6 +18,11 @@ from rest_framework.decorators import api_view
 from passenger_information.models import Passenger, PlacedPassenger
 import random, math
 from faker import Faker
+import json
+import bson
+from django.http import HttpResponse
+
+
 
 # Listing all of the flights
 class ListFlightsView(APIView):
@@ -52,7 +60,65 @@ def get_roster_by_flight(request, flight_id):
     roster = flight.flight_roster
     serializer = RosterSerializer(roster)
     return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_json(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    serializer = RosterSerializer(roster)
+    json_data = json.dumps(serializer.data, indent=4)
+    response = HttpResponse(json_data, content_type='application/json')
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.json"'
+    return response
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_nosql(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    serializer = RosterSerializer(roster)
+    nosqldata = bson.dumps(serializer.data)
+    response = HttpResponse(nosqldata, content_type='application/bson')
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.bson"'
+    return response
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_sql(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    data = StringIO()
+    call_command('dumpdata', 'flight_information.Roster', '--pks', str(roster.id), indent=2, natural_foreign=True, stdout=data)
+    data.seek(0)
+
+    response = HttpResponse(data, content_type='application/db')
+    response['Content-Disposition'] = f'attachment; filename="roster_{roster.pk}.db"'
+    return response
 
 def assign_seats_helper(flight, flight_number, type):
     
