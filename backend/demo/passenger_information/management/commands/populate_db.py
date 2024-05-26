@@ -110,7 +110,7 @@ class Command(BaseCommand):
                       "languages": random.choice([["English", fake.language_name()],
                                                   ["English"]]),
                       "vehicle": random.choice(VehicleType.objects.all()),
-                      "range": random.choice([1500, 3000, 10000]),
+                      "range": random.choice([2500, 5000, 10000, 20000]),
                       # 0 - Trainee, 1 - Junior, 2 - Senior
                       "seniority": fake.random_element(elements=OrderedDict([(2, 0.3),
                                                                              (1, 0.3),
