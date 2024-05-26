@@ -131,3 +131,47 @@ class RosterCreationTestCases(APITestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['flight_passengers']), 19)
+
+class FlightFilterFromTestCases(APITestCase):
+    fixtures = ['db_out.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        token, created = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_fights_from(self):
+        url = reverse('flight_from', args=['SFO'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        self.assertEqual(response.data[0]["flight_number"], "AA105")
+
+    def test_fights_from_invalid_loc(self):
+        url = reverse('flight_from', args=['RANDOMLOC'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.data, {"error": "Invalid location code."})
+
+class FlightFilterDateTestCases(APITestCase):
+    fixtures = ['db_out.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        token, created = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_fights_before(self):
+        url = reverse('flight_before', args=['2025-06-01T12:15:00Z'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]["flight_number"], "AA103")
+
+    def test_fights_from_invalid(self):
+        url = reverse('flight_before', args=['192318931'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {"error": "Date parameter required"})

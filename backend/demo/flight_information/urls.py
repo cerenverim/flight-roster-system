@@ -10,4 +10,8 @@ urlpatterns = [
     path('flights/<str:flight_id>/roster/nosql', views.download_nosql, name='download_nosql'),
     path('flights/<str:flight_id>/roster/sql', views.download_sql, name='download_sql'),
     path('flights/<str:flight_number>/delete_roster/', views.delete_roster, name='delete_roster'),
+    path('flights/from/<str:from_code>', views.get_flights_from, name='flight_from'),
+    path('flights/to/<str:to_code>', views.get_flights_to, name='flight_to'),
+    path('flights/before/<str:date>', views.get_flights_before, name='flight_before'),
+    path('flights/after/<str:date>', views.get_flights_after, name='flight_after'),
 ]

@@ -1,6 +1,7 @@
 from io import StringIO
 from django.core.management import call_command
 from django.shortcuts import get_object_or_404
+from django.utils.dateparse import parse_datetime
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
@@ -43,6 +44,59 @@ class FlightDetailsView(APIView):
         serializer = FlightSerializer(flight)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_flights_from(request, from_code):
+    if len(from_code) != 3:
+        return Response({"error": "Invalid location code."}, status=status.HTTP_404_NOT_FOUND)
+
+    flights = Flight.objects.filter(flight_src=from_code)
+    serializer = FlightSerializer(flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_flights_to(request, to_code):
+    if len(to_code) != 3:
+        return Response({"error": "Invalid location code."}, status=status.HTTP_404_NOT_FOUND)
+
+    flights = Flight.objects.filter(flight_dest=to_code)
+    serializer = FlightSerializer(flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_flights_before(request, date):
+    try:
+        filter_date = parse_datetime(date)
+        if filter_date:
+            filtered_flights = Flight.objects.filter(flight_date__lt=filter_date)
+            serializer = FlightSerializer(filtered_flights, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    except ValueError:
+        return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"error": "Date parameter required"}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_flights_after(request, date):
+    try:
+        filter_date = parse_datetime(date)
+        if filter_date:
+            filtered_flights = Flight.objects.filter(flight_date__gt=filter_date)
+            serializer = FlightSerializer(filtered_flights, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+    except ValueError:
+        return Response({"error": "Invalid date format"}, status=status.HTTP_400_BAD_REQUEST)
+
+    return Response({"error": "Date parameter required"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
