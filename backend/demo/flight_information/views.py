@@ -189,7 +189,7 @@ def assign_seats_helper(flight, flight_number, type):
             if passenger in processed_passengers:
                 continue
             if passenger.affiliated_passenger.exists():
-                affiliated_passengers = passenger.affiliated_passenger.filter(seat_no__isnull=True)
+                affiliated_passengers = passenger.affiliated_passenger.filter(seat_no__isnull=True, age__gt=2)
                 passenger_group = list(affiliated_passengers) + [passenger]
                 if assign_consecutive_seats(passenger_group):
                     processed_passengers.update(passenger_group)
