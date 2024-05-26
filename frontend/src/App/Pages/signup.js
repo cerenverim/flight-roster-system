@@ -27,7 +27,7 @@ function SignUpPage() {
             dispatch(setUser(data.user));
             dispatch(setToken(data.token));
             setAuthToken(data.token);
-            navigate('/userProfile');
+            navigate('/'); // Eğer login başarılıysa, kullanıcıyı yönlendir
         } catch (error) {
             console.error('Error during sign up process:', error);
             if (error.response && error.response.data) {

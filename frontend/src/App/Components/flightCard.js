@@ -1,14 +1,20 @@
 import React from 'react';
 
-function FlightCard({ flight }) {
+function FlightCard({ flight, onClick }) {
     // Helper function to format the date
     const formatDate = (dateString) => {
-        const options = { year: 'numeric', month: 'long', day: 'numeric' };
+        const options = { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
         return new Date(dateString).toLocaleDateString(undefined, options);
     };
 
     return (
-        <div className="flight-card">
+        <div className="flight-card" onClick={() => onClick()}>
             <h2 className="flight-number">Flight Number: {flight.flight_number}</h2>
             {flight.shared_flight && (
                 <div className="shared-flight-info">

@@ -1,4 +1,7 @@
+from io import StringIO
+from django.core.management import call_command
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -9,11 +12,37 @@ from cabin_crew_information.models import CabinCrew
 from passenger_information.serializers import PassengerSerializer
 from .models import Flight, Roster
 from flight_crew_information.models import FlightCrew
-from .serializers import FlightSerializer, RosterSerializer
+from .serializers import FlightSerializer, RosterSerializer, RosterSerializer
 from rest_framework.decorators import api_view
 from passenger_information.models import Passenger, PlacedPassenger
 import random, math
 from faker import Faker
+import json
+import bson
+from django.http import HttpResponse
+
+
+
+# Listing all of the flights
+class ListFlightsView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type').order_by('flight_number')
+        serializer = FlightSerializer(flights, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+# Viewing the flight details
+class FlightDetailsView(APIView):
+    authentication_classes = [SessionAuthentication, TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, flight_number, *args, **kwargs):
+        flight = get_object_or_404(Flight, flight_number=flight_number)
+        serializer = FlightSerializer(flight)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
@@ -31,36 +60,66 @@ def get_roster_by_flight(request, flight_id):
     serializer = RosterSerializer(roster)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-# Listing all of the flights
-class ListFlightsView(APIView):
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_json(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, *args, **kwargs):
-        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
-        serializer = FlightSerializer(flights, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
 
-# Viewing the flight details
-class FlightDetailsView(APIView):
-    authentication_classes = [SessionAuthentication, TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    roster = flight.flight_roster
+    serializer = RosterSerializer(roster)
+    json_data = json.dumps(serializer.data, indent=4)
+    response = HttpResponse(json_data, content_type='application/json')
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.json"'
+    return response
 
-    def get(self, request, flight_number, *args, **kwargs):
-        flight = get_object_or_404(Flight, flight_number=flight_number)
-        serializer = FlightSerializer(flight)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_nosql(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
 
-# Viewing the flight details
-class RosterView(APIView):
-    def get(self, request, flight_number, *args, **kwargs):
-        flight = get_object_or_404(Flight, flight_number=flight_number)
-        serializer = RosterSerializer(flight.flight_roster)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    serializer = RosterSerializer(roster)
+    nosqldata = bson.dumps(serializer.data)
+    response = HttpResponse(nosqldata, content_type='application/bson')
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.bson"'
+    return response
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def download_sql(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    data = StringIO()
+    call_command('dumpdata', 'flight_information.Roster', '--pks', str(roster.id), indent=2, natural_foreign=True, stdout=data)
+    data.seek(0)
+
+    response = HttpResponse(data, content_type='application/db')
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.db"'
+    return response
 
 def assign_seats_helper(flight, flight_number, type):
-    
     allPlaced = []
 
     # Get all passengers for the flight
@@ -130,7 +189,7 @@ def assign_seats_helper(flight, flight_number, type):
             if passenger in processed_passengers:
                 continue
             if passenger.affiliated_passenger.exists():
-                affiliated_passengers = passenger.affiliated_passenger.filter(seat_no__isnull=True)
+                affiliated_passengers = passenger.affiliated_passenger.filter(seat_no__isnull=True, age__gt=2)
                 passenger_group = list(affiliated_passengers) + [passenger]
                 if assign_consecutive_seats(passenger_group):
                     processed_passengers.update(passenger_group)
@@ -159,8 +218,8 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number,1)
-    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    businessPlaced = assign_seats_helper(flight, flight_number, 1)
+    economyPlaced = assign_seats_helper(flight, flight_number, 0)
     placed_passengers = businessPlaced + economyPlaced
 
     selected_vehicle = flight.vehicle_type
@@ -299,21 +358,21 @@ def auto_generate_roster(request, flight_number):
 def delete_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster == None:
-        return Response({"message":"No such roster!"}, status=status.HTTP_200_OK)
-    
-    
+        return Response({"message":"No such roster!"}, status=status.HTTP_404_NOT_FOUND)
+
+
     placed_passengers = flight.flight_roster.flight_passengers.all()
-    
+
     # Remove the placed passengers from the roster relationship
-    
+
     placed_passenger_ids = placed_passengers.values_list('id', flat=True)
     PlacedPassenger.objects.filter(id__in=placed_passenger_ids).delete()
 
     flight.flight_roster.delete()
-    
+
     flight.flight_roster = None
     flight.save()
 
     # Delete the placed passengers from the database
 
-    return Response({"message":"Succesfully deleted roaster"}, status=status.HTTP_200_OK)
+    return Response({"message":"Succesfully deleted roster"}, status=status.HTTP_200_OK)

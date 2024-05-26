@@ -75,3 +75,59 @@ class FlightTests(APITestCase):
         url = reverse('flight_details', args=['CC999'])
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+class DownloadRosterTestCase(APITestCase):
+    fixtures = ['db_out.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        token, created = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_json_download(self):
+        url = reverse('download_json', args=['AA103'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        self.assertIn('attachment', response['Content-Disposition'])
+        self.assertTrue(response.content)
+
+    def test_nosql_download(self):
+        url = reverse('download_nosql', args=['AA103'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/bson')
+        self.assertIn('attachment', response['Content-Disposition'])
+        self.assertTrue(response.content)
+
+    def test_sql_download(self):
+        url = reverse('download_sql', args=['AA103'])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/db')
+        self.assertIn('attachment', response['Content-Disposition'])
+        self.assertTrue(response.content)
+
+class RosterCreationTestCases(APITestCase):
+    fixtures = ['full_db.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        token, created = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_generate_full(self):
+        url = reverse('auto_generate_roster', args=['FL0004'])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['flight_crew_junior']), 1)
+        self.assertEqual(len(response.data['flight_crew_senior']), 1)
+        self.assertEqual(len(response.data['flight_crew_trainee']), 0)
+
+    def test_place_passengers(self):
+        url = reverse('auto_generate_roster', args=['FL0004'])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['flight_passengers']), 19)

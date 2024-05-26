@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react';
-import { Row, Col, Space, Button, Tabs, Layout } from 'antd';
+import React from 'react';
+import { Space, Button, Tabs, Layout } from 'antd';
 import TabularView from '../Components/tabularView';
 import ExtendedView from '../Components/extendedView';
 import PlaneView from '../Components/planeView';
-import AppHeader from '../Components/appHeader';
 import FlightSummary from '../Components/flightSummary';
-import FlightMenu from "../Components/flightMenu";
-import { FlightApi } from '../APIs/FlightApi';
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 function ViewPage({ type, flightId }) {
     const [rosterExist, setRosterExist] = useState(true);
@@ -135,15 +132,6 @@ function ViewPage({ type, flightId }) {
     }, [rosterExist]);
     return (
         <Layout>
-            <Header style={{
-                backgroundColor: '#ebebeb',
-                paddingLeft: '15px',
-                paddingRight: '15px',
-                zIndex: 3,
-                boxShadow: "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)"
-            }}>
-                <AppHeader username='USER' />
-            </Header>
             <Content >
                 <FlightSummary departurePoint='Bengaluru (BLR)' departureDate='Mon, 14 Jun 2021' returnPoint='New Delhi (Del)' returnDate='Fri, 18 Jun 2021' />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />

@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Table, Input, Button, Popconfirm, Form, Tag, Space, Layout, Typography } from 'antd';
-import AppHeader from '../Components/appHeader';
+import { Table, Input, Button, Popconfirm, Space, Layout, Typography } from 'antd';
 import FlightSummary from '../Components/flightSummary';
 import { PilotApi } from '../APIs/PilotApi';
 import { CabinCrewApi } from '../APIs/CabinApi';
 import { SearchOutlined } from '@ant-design/icons';
-const { Header, Content } = Layout;
+const { Content } = Layout;
 function ManualSelectionPage({ type }) {
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
 
@@ -470,15 +469,6 @@ function ManualSelectionPage({ type }) {
     ];
     return (
         <Layout >
-            <Header style={{
-                backgroundColor: '#ebebeb',
-                paddingLeft: '15px',
-                paddingRight: '15px',
-                zIndex: 3,
-                boxShadow: "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)"
-            }}>
-                <AppHeader username='USER' />
-            </Header>
             <Content >
                 <FlightSummary departurePoint='Bengaluru (BLR)' departureDate='Mon, 14 Jun 2021' returnPoint='New Delhi (Del)' returnDate='Fri, 18 Jun 2021' />
                 <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>

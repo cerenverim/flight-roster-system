@@ -11,12 +11,17 @@ const userReducer = (state = initialState, action) => {
                 currentUser: action.payload
             };
         case 'SET_TOKEN':
-        return {
-            ...state,
-            token: action.payload
-        };
+            return {
+                ...state,
+                token: action.payload
+            };
+        case 'LOGOUT':
+            return {
+                ...initialState, // Reset to initial state
+            };
         default:
             return state;
     }
 };
+
 export default userReducer;

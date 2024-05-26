@@ -231,10 +231,11 @@ class Command(BaseCommand):
         Dish.objects.all().delete()
         CabinCrew.objects.all().delete()
         Passenger.objects.all().delete()
+        Location.objects.all().delete()
 
 
     def load_vehicle_types(self):
-        if not VehicleType.objects.all().filter(vehicle_name="single-aisle aircraft"):
+        if not VehicleType.objects.all().filter(vehicle_name="twin-aisle aircraft"):
 
             brownie_dish = Dish.objects.all().filter(dish="Brownie")
             if not brownie_dish:
@@ -242,7 +243,8 @@ class Command(BaseCommand):
                 dish.save()
                 brownie_dish = dish
 
-            vehicle = VehicleType(vehicle_name="twin-aisle aircraft",
+            vehicle = VehicleType(id=3,
+                                  vehicle_name="twin-aisle aircraft",
                                   vehicle_passenger_capacity=180,
                                   vehicle_crew_capacity=20,
                                   vehicle_pilot_capacity=8,
@@ -253,7 +255,7 @@ class Command(BaseCommand):
             vehicle.std_menu.set([brownie_dish])
             vehicle.save()
 
-        if not VehicleType.objects.all().filter(vehicle_name="twin-aisle aircraft"):
+        if not VehicleType.objects.all().filter(vehicle_name="single-aisle aircraft"):
 
             bread_roll_dish = Dish.objects.all().filter(dish="Bread Roll")
             if not bread_roll_dish:
@@ -261,7 +263,8 @@ class Command(BaseCommand):
                 dish.save()
                 bread_roll_dish = dish
 
-            vehicle = VehicleType(vehicle_name="single-aisle aircraft",
+            vehicle = VehicleType(id=2,
+                                  vehicle_name="single-aisle aircraft",
                                   vehicle_passenger_capacity=80,
                                   vehicle_crew_capacity=12,
                                   vehicle_pilot_capacity=4,
@@ -280,7 +283,8 @@ class Command(BaseCommand):
                 dish.save()
                 baklava_dish = dish
 
-            vehicle = VehicleType(vehicle_name="regional jet",
+            vehicle = VehicleType(id=1,
+                                  vehicle_name="regional jet",
                                   vehicle_passenger_capacity=20,
                                   vehicle_crew_capacity=6,
                                   vehicle_pilot_capacity=2,
@@ -504,6 +508,12 @@ class Command(BaseCommand):
 
         random_passengers = passengers[:len(passengers) // 2]
         seat_number = [passengers.index(x) for x in passengers if x in random_passengers]
+
+        # assign seats for plane
+        for passenger, seat_number in zip(random_passengers, seat_number):
+            passenger.seat_no = seat_number + 1
+            passenger.save()
+
         
         for passenger in passengers:
 
@@ -547,11 +557,6 @@ class Command(BaseCommand):
                 # child sits on parent
                 passenger.seat_no = None
                 passenger.save()
-
-                if parent.seat_no:
-                    parent_placement = PlacedPassenger(passenger=parent, seat_no=parent.seat_no)
-                    parent_placement.save()
-
 
     # not in use
     def generate_Roster(self, flight):
