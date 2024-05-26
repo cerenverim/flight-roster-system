@@ -507,8 +507,6 @@ class Command(BaseCommand):
 
         # assign seats for plane
         for passenger, seat_number in zip(random_passengers, seat_number):
-            placed_passenger = PlacedPassenger(passenger=passenger,seat_no=seat_number + 1)
-            placed_passenger.save()
             passenger.seat_no = seat_number + 1
             passenger.save()
 
@@ -555,11 +553,6 @@ class Command(BaseCommand):
                 # child sits on parent
                 passenger.seat_no = None
                 passenger.save()
-
-                if parent.seat_no:
-                    parent_placement = PlacedPassenger(passenger=parent, seat_no=parent.seat_no)
-                    parent_placement.save()
-
 
     # not in use
     def generate_Roster(self, flight):
