@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import './landing.css';
 import { FlightApi } from '../APIs/FlightApi';
-import FlightCard  from '../Components/flightCard';
-
+import FlightCard from '../Components/flightCard';
 function LandingPage() {
 
 
@@ -56,7 +55,10 @@ function LandingPage() {
 
     return (
         <div className="landing-container">
-
+            <header className="header">
+                <h1>HOME</h1>
+                <button className="user-button">USER</button>
+            </header>
             <form className="search-form" onSubmit={handleSubmit}>
                 <div className="search-options">
                     <label>
@@ -109,7 +111,7 @@ function LandingPage() {
                                 <i className="fas fa-calendar-alt"></i> Depart
                             </label>
                             <input
-                                type="date"
+                                type="text"
                                 id="depart"
                                 placeholder="DD/MM/YYYY"
                                 value={depart}
@@ -121,9 +123,9 @@ function LandingPage() {
                                 <i className="fas fa-calendar-alt"></i> Return
                             </label>
                             <input
-                                type="date"
+                                type="text"
                                 id="return"
-                                placeholder=''
+                                placeholder="DD/MM/YYYY"
                                 value={returnDate}
                                 onChange={handleInputChange(setReturnDate)}
                             />
@@ -145,24 +147,6 @@ function LandingPage() {
                 )}
                 <button type="submit" className="search-button"><i className="fas fa-search"></i> Search</button>
             </form>
-            <div className="flight-results">
-                {isLoading ? (
-                    <p>Loading...</p>
-                ) : error ? (
-                    <p className="error">{error}</p>
-                ) : (
-                    flights.length > 0 ? (
-                        <ul className="flight-card-list"> 
-                            {flights.map(flight => (
-                                <FlightCard key={flight.flight_number} flight={flight} />
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No flights found.</p>
-                    )
-                )}
-            </div>
-
         </div>
     );
 }
