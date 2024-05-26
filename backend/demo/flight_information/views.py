@@ -116,7 +116,7 @@ def download_sql(request, flight_id):
     data.seek(0)
 
     response = HttpResponse(data, content_type='application/db')
-    response['Content-Disposition'] = f'attachment; filename="roster_{roster.pk}.db"'
+    response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.db"'
     return response
 
 def assign_seats_helper(flight, flight_number, type):
