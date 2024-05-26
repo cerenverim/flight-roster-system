@@ -136,7 +136,7 @@ def assign_seats_helper(flight, flight_number, type):
     
     return allPlaced
 
-@api_view(['GET'])
+@api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
 def auto_generate_roster(request, flight_number):
