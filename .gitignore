@@ -272,3 +272,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,windows,macos,linux
+/backend/demo/cabin_crew_information/migrations
+/backend/demo/flight_crew_information/migrations
+/backend/demo/flight_information/migrations
+/backend/demo/passenger_information/migrations

@@ -7,9 +7,7 @@ import AppHeader from '../Components/appHeader';
 import FlightSummary from '../Components/flightSummary';
 const { Header, Content } = Layout;
 
-
-
-function ViewPage() {
+function ViewPage({ type }) {
     const items = [
         {
             key: '1',
@@ -19,7 +17,7 @@ function ViewPage() {
         {
             key: '2',
             label: 'PLANE VIEW',
-            children: <PlaneView />,
+            children: <PlaneView type={type} />,
         },
         {
             key: '3',
@@ -37,10 +35,10 @@ function ViewPage() {
                 zIndex: 3,
                 boxShadow: "0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)"
             }}>
-                <AppHeader />
+                <AppHeader username='USER' />
             </Header>
             <Content >
-                <FlightSummary />
+                <FlightSummary departurePoint='Bengaluru (BLR)' departureDate='Mon, 14 Jun 2021' returnPoint='New Delhi (Del)' returnDate='Fri, 18 Jun 2021' />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />
                 <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
                     <Button type="primary">CONFIRM</Button>

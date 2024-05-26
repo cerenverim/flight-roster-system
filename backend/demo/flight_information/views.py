@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
@@ -9,7 +10,7 @@ from cabin_crew_information.models import CabinCrew
 from passenger_information.serializers import PassengerSerializer
 from .models import Flight, Roster
 from flight_crew_information.models import FlightCrew
-from .serializers import FlightSerializer, RosterSerializer
+from .serializers import FlightSerializer, RosterSerializer, RosterSerializer
 from rest_framework.decorators import api_view
 from passenger_information.models import Passenger, PlacedPassenger
 import random, math
@@ -21,7 +22,7 @@ class ListFlightsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type')
+        flights = Flight.objects.all().select_related('flight_roster', 'vehicle_type').order_by('flight_number')
         serializer = FlightSerializer(flights, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -34,14 +35,24 @@ class FlightDetailsView(APIView):
         flight = get_object_or_404(Flight, flight_number=flight_number)
         serializer = FlightSerializer(flight)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
 
-# Viewing the flight details
-class RosterView(APIView):
-    def get(self, request, flight_number, *args, **kwargs):
-        flight = get_object_or_404(Flight, flight_number=flight_number)
-        serializer = RosterSerializer(flight.flight_roster)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def get_roster_by_flight(request, flight_id):
+    try:
+        flight = Flight.objects.get(flight_number=flight_id)
+    except Flight.DoesNotExist:
+        return Response({"detail": "Flight not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    if flight.flight_roster is None:
+        return Response({"detail": "Roster not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    roster = flight.flight_roster
+    serializer = RosterSerializer(roster)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+    
 
 def assign_seats_helper(flight, flight_number, type):
     

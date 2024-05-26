@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect, useRef } from "react";
+import { React, useState, useEffect, useRef } from "react";
 import { Table, Input, Button, Tag, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
