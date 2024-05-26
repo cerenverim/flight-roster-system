@@ -120,7 +120,6 @@ def download_sql(request, flight_id):
     return response
 
 def assign_seats_helper(flight, flight_number, type):
-    
     allPlaced = []
 
     # Get all passengers for the flight
