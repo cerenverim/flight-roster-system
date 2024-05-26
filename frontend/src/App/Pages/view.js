@@ -5,28 +5,9 @@ import ExtendedView from '../Components/extendedView';
 import PlaneView from '../Components/planeView';
 import AppHeader from '../Components/appHeader';
 import FlightSummary from '../Components/flightSummary';
-import axios from 'axios';
 const { Header, Content } = Layout;
 
 function ViewPage({ type }) {
-    async function getCabinCrew(type) {
-        try {
-            const response = await axios.get('http://localhost:5000/api/cabincrew');
-            console.log(response.data);
-        } catch (error) {
-            console.error('Error during fetching cabin crew:', error.response || error);
-            throw error;
-        }
-    }
-    async function getCabinCrew(type) {
-        try {
-            const response = await axios.get('http://localhost:5000/api/cabincrew');
-            console.log(response.data);
-        } catch (error) {
-            console.error('Error during fetching cabin crew:', error.response || error);
-            throw error;
-        }
-    }
     const items = [
         {
             key: '1',
