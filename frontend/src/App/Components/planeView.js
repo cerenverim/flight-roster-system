@@ -1,8 +1,7 @@
 import { React, useState, useEffect, useRef } from "react";
 import { Tooltip, Row, Col, Card, Space, Typography } from "antd";
 import Icon from '@ant-design/icons';
-import FlightMenu from "./flightMenu";
-function PlaneView({ type }) {
+function PlaneView({ type, flightCrew, cabinCrew, passengers }) {
     const seat = () => (<svg xmlns="http://www.w3.org/2000/svg" fill="#000000" height="35px" width="35px" version="1.1" id="Layer_1" viewBox="0 0 512 512" >
         <g transform="translate(1 1)">
             <g>
@@ -498,7 +497,6 @@ function PlaneView({ type }) {
                     {generateRowsCabin(6)}
                     <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
                     {generateRowsPassenger(10, 1, 20)}
-                    <FlightMenu menu={menu} />
                 </Space>
             ) : type === 2 ? (
                 <Space key="type-2" direction="vertical" style={{ width: '60%', margin: '0px 50px ' }}>
@@ -508,7 +506,6 @@ function PlaneView({ type }) {
                     {generateRowsCabin(12)}
                     <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
                     {generateRowsPassenger(20, 2, 20)}
-                    <FlightMenu menu={menu} />
                 </Space>
             ) : (
                 <Space key="type-3" direction="vertical" style={{ width: '60%', margin: '0px 50px ' }}>
@@ -518,7 +515,6 @@ function PlaneView({ type }) {
                     {generateRowsCabin(20)}
                     <Typography.Title style={{ textAlign: 'center' }} level={4}>Passengers</Typography.Title>
                     {generateRowsPassenger(30, 3, 60)}
-                    <FlightMenu menu={menu} />
                 </Space>
             )}
         </>

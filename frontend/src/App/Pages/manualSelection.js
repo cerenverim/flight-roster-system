@@ -19,8 +19,8 @@ function ManualSelectionPage({ type }) {
     useEffect(() => {
         let flightCrew;
         PilotApi.getFlightCrew(1).then((response) => {
-            console.log(response.data);
-            flightCrew = response.data.map((item) => ({
+            console.log(response);
+            flightCrew = response.map((item) => ({
                 "key": item.id,
                 "id": item.id,
                 "name": item.name,
@@ -37,7 +37,7 @@ function ManualSelectionPage({ type }) {
 
         let cabinCrew;
         CabinCrewApi.getCabinCrew(1).then((response) => {
-            cabinCrew = response.data.map((item) => ({
+            cabinCrew = response.map((item) => ({
                 "key": item.id,
                 "id": item.id,
                 "name": item.name,

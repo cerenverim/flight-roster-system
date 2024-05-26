@@ -2,10 +2,9 @@ import React from "react";
 import { useState, useEffect, useRef } from "react";
 import { Table, Input, Button, Tag, Space, Row, Col, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import FlightMenu from "./flightMenu";
 
 
-function ExtendedView() {
+function ExtendedView(flightCrew, cabinCrew, passengers) {
     const [flightSource, setFlightSource] = useState([
         {
             key: '0',
@@ -487,7 +486,7 @@ function ExtendedView() {
                     <Table
                         scroll={{ x: true }}
                         bordered
-                        dataSource={flightSource}
+                        dataSource={flightCrew}
                         columns={flightColumns}
                     />
                 </Col>
@@ -499,7 +498,7 @@ function ExtendedView() {
                     <Table
                         scroll={{ x: true }}
                         bordered
-                        dataSource={cabinSource}
+                        dataSource={cabinCrew}
                         columns={cabinColumns}
                     />
                 </Col>
@@ -510,14 +509,9 @@ function ExtendedView() {
                     <Table
                         scroll={{ x: true }}
                         bordered
-                        dataSource={passengerSource}
+                        dataSource={passengers}
                         columns={passengerColumns}
                     />
-                </Col>
-            </Row>
-            <Row>
-                <Col span={24}>
-                    <FlightMenu menu={menu} />
                 </Col>
             </Row>
         </>

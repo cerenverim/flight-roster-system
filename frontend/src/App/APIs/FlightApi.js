@@ -1,5 +1,6 @@
 import baseServiceApi from './baseServiceApi';
 
+const FL0001 = "FL0001";
 const getFlightsByID = async (flightNumber) => {
     try {
         // Fetch all flights
@@ -45,8 +46,49 @@ const getFlightsByFilter = async (filters) => {
     }
 };
 
+const getFlightRoster = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.get(`/flights_api/flights/${flightNumber}/roster/`);
+        console.log(response);
+        return response.data;
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        return [];
+    }
+}
+
+const generateFlightRoster = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/auto_generate_roster/`);
+        console.log(response);
+        return response.data;
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        return [];
+    }
+}
+
+const deleteFlightRoster = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.delete(`/flights_api/flights/${FL0001}/delete_roster/`);
+        console.log(response);
+        return response.data;
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        throw error;
+    }
+}
 
 export const FlightApi = {
     getFlightsByID,
-    getFlightsByFilter
+    getFlightsByFilter,
+    getFlightRoster,
+    generateFlightRoster,
+    deleteFlightRoster
 };

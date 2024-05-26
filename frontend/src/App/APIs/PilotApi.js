@@ -3,7 +3,7 @@ const getFlightCrew = async (type) => {
     try {
         const response = await baseServiceApi.get(`pilot_api/pilots/${type}`);
         console.log(response);
-        return response;
+        return response.data;
     }
     catch (error) {
         console.error('Error during flight info:', error.response || error);

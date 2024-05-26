@@ -1,8 +1,8 @@
 import { React, useState, useEffect, useRef } from "react";
 import { Table, Input, Button, Tag, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import FlightMenu from "./flightMenu";
-function TabularView() {
+
+function TabularView({ dataSource }) {
     const [dataSource, setDataSource] = useState([
         {
             key: '0',
@@ -176,7 +176,7 @@ function TabularView() {
                 dataSource={dataSource}
                 columns={defaultColumns}
             />
-            <FlightMenu menu={menu} />
+
         </div>
 
 
