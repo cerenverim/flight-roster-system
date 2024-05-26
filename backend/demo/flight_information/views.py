@@ -218,8 +218,8 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number,1)
-    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    businessPlaced = assign_seats_helper(flight, flight_number, 1)
+    economyPlaced = assign_seats_helper(flight, flight_number, 0)
     placed_passengers = businessPlaced + economyPlaced
 
     selected_vehicle = flight.vehicle_type
