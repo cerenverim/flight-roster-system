@@ -299,7 +299,7 @@ def auto_generate_roster(request, flight_number):
 def delete_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster == None:
-        return Response({"message":"No such roster!"}, status=status.HTTP_200_OK)
+        return Response({"message":"No such roster!"}, status=status.HTTP_404_NOT_FOUND)
     
     
     placed_passengers = flight.flight_roster.flight_passengers.all()
