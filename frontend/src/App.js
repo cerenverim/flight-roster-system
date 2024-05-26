@@ -11,6 +11,7 @@ import { Layout } from 'antd';
 import AppHeader from './App/Components/appHeader';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
+import { setAuthToken } from './App/APIs/baseServiceApi';
 
 
 const { Header} = Layout;
@@ -22,6 +23,7 @@ function App() {
       console.log(token);
       if (token) {
           dispatch({ type: 'SET_TOKEN', payload: token });
+          setAuthToken(token);
       }
   }, [dispatch]);
   return (

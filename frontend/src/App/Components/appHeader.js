@@ -37,7 +37,7 @@ function AppHeader(props) {
             padding: '0px 37px 0px 33px'
         }}>
             <Link to="/" style={{ color: '#0958d9', fontWeight: 'bold', fontSize: '27px' }}>HOME</Link>
-            <Dropdown overlay={
+            <Dropdown menu={
                 <Menu items={dropdownItems} onClick={(e) => e.domEvent.stopPropagation()} />
             } trigger={['click']}>
                 <a onClick={(e) => e.preventDefault()} style={{ display: 'flex', alignItems: 'center' }}>
