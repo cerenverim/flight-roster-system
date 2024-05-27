@@ -53,7 +53,7 @@ function LandingPage() {
         setError('');
         try {
             const data = searchType === 'flightInfo'
-                ? await FlightApi.getFlightsByFilter({ from, to, depart, returnDate })
+                ? await FlightApi.getFlightsByFilter(from, to, depart, returnDate)
                 : await FlightApi.getFlightsByID(flightID);
             setFlights(data);
         } catch (error) {
