@@ -272,25 +272,40 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number, 1)
-    economyPlaced = assign_seats_helper(flight, flight_number, 0)
-    placed_passengers = businessPlaced + economyPlaced
+
 
     selected_vehicle = flight.vehicle_type
 
     # 0 - Trainee, 1 - Junior, 2 - Senior
 
-    senior_pilots = FlightCrew.objects.all().filter(seniority=2,
-                                                    vehicle=selected_vehicle.id)
+    senior_pilots = FlightCrew.objects.filter(seniority=2, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+    
     senior_pilots = list(senior_pilots)
 
-    junior_pilots = FlightCrew.objects.all().filter(seniority=1,
-                                                    vehicle=selected_vehicle.id)
+    junior_pilots = FlightCrew.objects.filter(seniority=1, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+
     junior_pilots = list(junior_pilots)
 
-    trainee_pilots = FlightCrew.objects.all().filter(seniority=0,
-                                                        vehicle=selected_vehicle.id)
+    trainee_pilots = FlightCrew.objects.filter(seniority=0, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+
     trainee_pilots = list(trainee_pilots)
+    
+    if not junior_pilots:
+        return Response({"message": "No junior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not trainee_pilots:
+        return Response({"message": "No trainee pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not senior_pilots:
+        return Response({"message": "No senior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Remaining code remains the same...
+
+
+
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
 
     # 0 - Chef, 1 - Junior, 2 - Senior
 
@@ -397,6 +412,131 @@ def auto_generate_roster(request, flight_number):
     roster.flight_passengers.set(roster_placed_passenger_ids)
     roster.flight_menu.set(flight_menu_ids)
 
+    roster.save()
+
+    flight.flight_roster = roster
+
+    flight.save()
+
+    serializer = RosterSerializer(roster)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+'''
+sample input 
+{
+  "pilot_ids": [1, 2, 3, 4, 5],  // Example IDs of pilots
+  "crew_ids": [6, 7, 8, 9, 10]   // Example IDs of crew members
+}
+'''
+@api_view(['POST'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def manual_generate_roster(request, flight_number):
+    flight = get_object_or_404(Flight, flight_number=flight_number)
+    if flight.flight_roster != None:
+        return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
+
+    selected_vehicle = flight.vehicle_type
+
+    data = request.data
+    pilot_ids = data.get('pilot_ids', [])
+    crew_ids = data.get('crew_ids', [])
+
+
+    if len(pilot_ids) != len(set(pilot_ids)):
+        return Response({"message": f"Provided pilots must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    if len(crew_ids) != len(set(crew_ids)):
+        return Response({"message": f"Provided crews must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    # Initialize separate lists for different seniority levels
+    roster_junior_pilot_ids = []
+    roster_senior_pilot_ids = []
+    roster_trainee_ids = []
+    roster_senior_cabin_ids = []
+    roster_junior_cabin_ids = []
+    roster_chef_ids = []
+
+        # Fetching and separating IDs based on seniority
+    pilots = FlightCrew.objects.filter(id__in=pilot_ids)
+    for pilot in pilots:
+        if pilot.seniority == 0:  # Trainee
+            roster_trainee_ids.append(pilot.id)
+        elif pilot.seniority == 1:  # Junior
+            roster_junior_pilot_ids.append(pilot.id)
+        elif pilot.seniority == 2:  # Senior
+            roster_senior_pilot_ids.append(pilot.id)
+        if pilot.max_range < flight.flight_distance:
+            return Response({"message": f"Pilot with ID {pilot.id} does not meet the distance requirement."}, status=status.HTTP_400_BAD_REQUEST)
+
+    crew = CabinCrew.objects.filter(id__in=crew_ids)
+    for crew_member in crew:
+        if crew_member.seniority == 0:  # Chef
+            roster_chef_ids.append(crew_member.id)
+        elif crew_member.seniority == 1:  # Junior
+            roster_junior_cabin_ids.append(crew_member.id)
+        elif crew_member.seniority == 2:  # Senior
+            roster_senior_cabin_ids.append(crew_member.id)
+    
+    if len(roster_senior_pilot_ids) < 1 or len(roster_junior_pilot_ids) < 1:
+        return Response({"message": "There must be at least one senior and one junior pilot."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_trainee_ids) > 2:
+        return Response({"message": "At most two trainee pilots are allowed."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_senior_cabin_ids) < 1 or len(roster_senior_cabin_ids) > 4:
+        return Response({"message": "There must be between 1 and 4 senior cabin crew members."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_junior_cabin_ids) < 4 or len(roster_junior_cabin_ids) > 16:
+        return Response({"message": "There must be between 4 and 16 junior cabin crew members."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if len(roster_chef_ids) > 2:
+        return Response({"message": "At most 2 chefs are allowed."}, status=status.HTTP_400_BAD_REQUEST),
+
+    all_pilot_ids = roster_junior_pilot_ids + roster_senior_pilot_ids + roster_trainee_ids
+    pilots = FlightCrew.objects.filter(id__in=all_pilot_ids)
+    for pilot in pilots:
+        if pilot.vehicle != selected_vehicle:
+            return Response({"message": f"Pilot {pilot.name} cannot operate the vehicle type {selected_vehicle.vehicle_name}."}, status=status.HTTP_400_BAD_REQUEST)
+
+    all_attendant_ids = roster_senior_cabin_ids + roster_junior_cabin_ids + roster_chef_ids
+    attendants = CabinCrew.objects.filter(id__in=all_attendant_ids)
+    for attendant in attendants:    
+        if selected_vehicle not in attendant.vehicle.all():
+            return Response({"message": f"Attendant {attendant.name} cannot operate in the vehicle type {selected_vehicle.vehicle_name}."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    total_crew = len(roster_senior_cabin_ids) + len(roster_junior_cabin_ids) + len(roster_chef_ids)
+    if total_crew > selected_vehicle.vehicle_crew_capacity:
+        return Response({"message": f"Total number of cabin crew exceeds the vehicle capacity."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    flight_menu = []
+
+    chefs = CabinCrew.objects.filter(id__in=roster_chef_ids)
+    for chef in chefs:
+        for dish in chef.dishes.all():
+            flight_menu.append(dish)
+
+    flight_menu = list(set(flight_menu))
+
+    flight_menu_ids = [menu.id for menu in flight_menu]
+    roster_placed_passenger_ids = [passenger.id for passenger in placed_passengers]
+
+    roster = Roster()
+    roster.save()
+
+    roster.flight_crew_junior.set(roster_junior_pilot_ids)
+    roster.flight_crew_senior.set(roster_senior_pilot_ids)
+    roster.flight_crew_trainee.set(roster_trainee_ids)
+    roster.flight_cabin_crew_senior.set(roster_senior_cabin_ids)
+    roster.flight_cabin_crew_junior.set(roster_junior_cabin_ids)
+    roster.flight_cabin_crew_chef.set(roster_chef_ids)
+    roster.flight_passengers.set(roster_placed_passenger_ids)
+    roster.flight_menu.set(flight_menu_ids)
     roster.save()
 
     flight.flight_roster = roster
