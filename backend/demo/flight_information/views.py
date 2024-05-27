@@ -211,6 +211,7 @@ def download_sql(request, flight_id):
     response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.db"'
     return response
 
+
 def assign_seats_helper(flight, flight_number, type):
     allPlaced = []
 
