@@ -473,9 +473,7 @@ def manual_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number,1)
-    economyPlaced = assign_seats_helper(flight, flight_number,0)
-    placed_passengers = businessPlaced + economyPlaced
+
 
     selected_vehicle = flight.vehicle_type
 
@@ -550,6 +548,10 @@ def manual_generate_roster(request, flight_number):
     if total_crew > selected_vehicle.vehicle_crew_capacity:
         return Response({"message": f"Total number of cabin crew exceeds the vehicle capacity."}, status=status.HTTP_400_BAD_REQUEST)
     
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
+
     flight_menu = []
 
     chefs = CabinCrew.objects.filter(id__in=roster_chef_ids)
