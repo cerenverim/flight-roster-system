@@ -37,19 +37,26 @@ py manage.py populate_db [Model] [amount]
 
 py manage.py populate_db Passenger 100 
 
+
 -Alternatively an automatic creation can be made with:
+
 
 py manage.py populate_db generate_database
 
+
 for an example database to test with
+
 
 get node.js if not already present and download npm:
 
 https://docs.npmjs.com/downloading-and-installing-node-js-and-npm
 
+
 -After getting a database run these in seperate terminals:
 
+
 py manage.py runserver
+
 
 npm start
 
