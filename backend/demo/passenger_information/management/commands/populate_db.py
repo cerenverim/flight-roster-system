@@ -234,62 +234,61 @@ class Command(BaseCommand):
 
 
     def load_vehicle_types(self):
-        if not VehicleType.objects.all().filter(vehicle_name="single-aisle aircraft"):
 
-            brownie_dish = Dish.objects.all().filter(dish="Brownie")
-            if not brownie_dish:
-                dish = Dish(dish="Brownie")
-                dish.save()
-                brownie_dish = dish
+        baklava_dish = Dish.objects.all().filter(dish="Baklava")
+        if not baklava_dish:
+            dish = Dish(dish="Baklava")
+            dish.save()
+            baklava_dish = dish
 
-            vehicle = VehicleType(vehicle_name="twin-aisle aircraft",
-                                  vehicle_passenger_capacity=180,
-                                  vehicle_crew_capacity=20,
-                                  vehicle_pilot_capacity=8,
-                                  vehicle_business_seats=60,
-                                  vehicle_seating_plan=0)
-            vehicle.save()
+        vehicle = VehicleType(id = 1,vehicle_name="regional jet",
+                                vehicle_passenger_capacity=20,
+                                vehicle_crew_capacity=6,
+                                vehicle_pilot_capacity=2,
+                                vehicle_business_seats=20,
+                                vehicle_seating_plan=2)
+        vehicle.save()
 
-            vehicle.std_menu.set([brownie_dish])
-            vehicle.save()
+        vehicle.std_menu.set([baklava_dish])
+        vehicle.save()
 
-        if not VehicleType.objects.all().filter(vehicle_name="twin-aisle aircraft"):
 
-            bread_roll_dish = Dish.objects.all().filter(dish="Bread Roll")
-            if not bread_roll_dish:
-                dish = Dish(dish="Bread Roll")
-                dish.save()
-                bread_roll_dish = dish
+        bread_roll_dish = Dish.objects.all().filter(dish="Bread Roll")
+        if not bread_roll_dish:
+            dish = Dish(dish="Bread Roll")
+            dish.save()
+            bread_roll_dish = dish
 
-            vehicle = VehicleType(vehicle_name="single-aisle aircraft",
-                                  vehicle_passenger_capacity=80,
-                                  vehicle_crew_capacity=12,
-                                  vehicle_pilot_capacity=4,
-                                  vehicle_business_seats=20,
-                                  vehicle_seating_plan=1)
-            vehicle.save()
+        vehicle = VehicleType(id = 2,vehicle_name="single-aisle aircraft",
+                                vehicle_passenger_capacity=80,
+                                vehicle_crew_capacity=12,
+                                vehicle_pilot_capacity=4,
+                                vehicle_business_seats=20,
+                                vehicle_seating_plan=1)
+        vehicle.save()
 
-            vehicle.std_menu.set([bread_roll_dish])
-            vehicle.save()
+        vehicle.std_menu.set([bread_roll_dish])
+        vehicle.save()
 
-        if not VehicleType.objects.all().filter(vehicle_name="regional jet"):
 
-            baklava_dish = Dish.objects.all().filter(dish="Baklava")
-            if not baklava_dish:
-                dish = Dish(dish="Baklava")
-                dish.save()
-                baklava_dish = dish
+        brownie_dish = Dish.objects.all().filter(dish="Brownie")
+        if not brownie_dish:
+            dish = Dish(dish="Brownie")
+            dish.save()
+            brownie_dish = dish
 
-            vehicle = VehicleType(vehicle_name="regional jet",
-                                  vehicle_passenger_capacity=20,
-                                  vehicle_crew_capacity=6,
-                                  vehicle_pilot_capacity=2,
-                                  vehicle_business_seats=20,
-                                  vehicle_seating_plan=2)
-            vehicle.save()
+        vehicle = VehicleType(id = 3,vehicle_name="twin-aisle aircraft",
+                                vehicle_passenger_capacity=180,
+                                vehicle_crew_capacity=20,
+                                vehicle_pilot_capacity=8,
+                                vehicle_business_seats=60,
+                                vehicle_seating_plan=0)
+        vehicle.save()
 
-            vehicle.std_menu.set([baklava_dish])
-            vehicle.save()
+        vehicle.std_menu.set([brownie_dish])
+        vehicle.save()
+
+
 
     # not in use
     def extract_place_info(self):
@@ -389,8 +388,8 @@ class Command(BaseCommand):
                                           timezone=tz.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated
-        flight_distance = random.choice([1500, 3000])
-        flight_duration = timedelta(days=0, hours=0, minutes=((flight_distance // 10) // 15) * 15)
+        flight_dist = random.choice([1500, 3000])
+        flight_dur = timedelta(days=0, hours=0, minutes=((flight_dist // 10) // 15) * 15)
     
 
         location_src, location_dest = fake.random_elements(list(Location.objects.all()), length=2, unique=True)
@@ -404,8 +403,8 @@ class Command(BaseCommand):
                         flight_src=location_src,
 
                         flight_date=flight_date,
-                        flight_duration=timedelta(days=0, hours=0, minutes=0),
-                        flight_distance=0,
+                        flight_duration=flight_dur,
+                        flight_distance=flight_dist,
 
                         flight_dest=location_dest,
 
@@ -715,10 +714,6 @@ class Command(BaseCommand):
         # assign seats for plane
         for i in range(1, len(roster_passengers) + 1):
             passenger = roster_passengers[i - 1]
-            placed_passenger = PlacedPassenger(passenger=passenger,
-                                               seat_no=i)
-            placed_passenger.save()
-            placed_passengers.append(placed_passenger)
 
             passenger.seat_no = i
             passenger.save()

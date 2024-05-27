@@ -22,23 +22,26 @@ const getFlightsByID = async (flightNumber) => {
     }
 };
 
-const getFlightsByFilter = async (filters) => {
-    console.log("Filters applied:", filters);
+const getFlightsByFilter = async (from, to, before, after) => {
+    let filter = "";
+    if (from !== "") {
+        filter += `from/${from.toUpperCase()}/`;
+    }
+    if (to !== "") {
+        filter += `to/${to.toUpperCase()}/`;
+    }
+    if (before !== "") {
+        filter += `before/${before}/`;
+    }
+    if (after !== "") {
+        filter += `after/${after}/`;
+    }
     try {
         // Fetch all flights
-        const response = await baseServiceApi.get('/flights_api/flights');
-        const allFlights = response.data;
+        const response = await baseServiceApi.get(`/flights_api/flights/${filter}`);
 
-        // Filter flights based on the provided filters
-        const filteredFlights = allFlights.filter(flight => {
-            // Check each filter criteria; return true if flight matches all non-empty filter fields
-            return (!filters.from || flight.flight_src === filters.from) &&
-                (!filters.to || flight.flight_dest === filters.to) &&
-                (!filters.depart || new Date(flight.flight_date).toDateString() === new Date(filters.depart).toDateString()) &&
-                (!filters.returnDate || (flight.return_date && new Date(flight.return_date).toDateString() === new Date(filters.returnDate).toDateString()));
-        });
 
-        return filteredFlights;
+        return response.data;
     } catch (error) {
         console.error('Error during fetching flights:', error.response || error);
         throw error;
@@ -73,14 +76,13 @@ const generateFlightRoster = async (flightNumber) => {
 
 const deleteFlightRoster = async (flightNumber) => {
     try {
-        const response = await baseServiceApi.delete(`/flights_api/flights/${flightNumber}/delete_roster/`);
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/delete_roster/`);
         console.log(response);
         return response.data;
-
     }
     catch (error) {
         console.error('Error during fetching flights:', error.response || error);
-        throw error;
+        return [];
     }
 }
 const downloadSql = async (flightNumber) => {
@@ -140,6 +142,18 @@ const downloadJson = async (flightNumber) => {
         throw error;
     }
 }
+const manualGenerateFlightRoster = async (flightNumber, data) => {
+    try {
+
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/manual_generate_roster/`, data);
+        console.log(response);
+        return response.data;
+    }
+    catch (error) {
+        return error.response.data.message;
+    }
+
+}
 
 export const FlightApi = {
     getFlightsByID,
@@ -149,5 +163,6 @@ export const FlightApi = {
     deleteFlightRoster,
     downloadSql,
     downloadNoSql,
-    downloadJson
+    downloadJson,
+    manualGenerateFlightRoster
 };

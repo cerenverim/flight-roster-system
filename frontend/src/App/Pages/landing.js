@@ -31,7 +31,7 @@ function LandingPage() {
     const handleContinue = () => {
         dispatch(setFlight(selectedFlight));
         dispatch(setRoster(rosterType));
-        if(rosterType === 'automatically') {
+        if (rosterType === 'automatically') {
             navigate('/view');
         } else {
             navigate('/manualSelection');
@@ -53,7 +53,7 @@ function LandingPage() {
         setError('');
         try {
             const data = searchType === 'flightInfo'
-                ? await FlightApi.getFlightsByFilter({ from, to, depart, returnDate })
+                ? await FlightApi.getFlightsByFilter(from, to, depart, returnDate)
                 : await FlightApi.getFlightsByID(flightID);
             setFlights(data);
         } catch (error) {
@@ -104,7 +104,7 @@ function LandingPage() {
                             </div>
                             <div className="form-field">
                                 <label htmlFor="depart">
-                                    <i className="fas fa-calendar-alt"></i> Depart
+                                    <i className="fas fa-calendar-alt"></i> Before
                                 </label>
                                 <input
                                     type="date"
@@ -116,7 +116,7 @@ function LandingPage() {
                             </div>
                             <div className="form-field">
                                 <label htmlFor="return">
-                                    <i className="fas fa-calendar-alt"></i> Return
+                                    <i className="fas fa-calendar-alt"></i> After
                                 </label>
                                 <input
                                     type="date"

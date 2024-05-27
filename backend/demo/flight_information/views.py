@@ -101,6 +101,44 @@ def get_flights_after(request, date):
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
+def get_filtered_flights(request, from_code=None, to_code=None, date_before=None, date_after=None):
+    filters = {}
+    
+    if from_code:
+        if len(from_code) != 3:
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
+        filters['flight_src'] = from_code
+    
+    if to_code:
+        if len(to_code) != 3:
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
+        filters['flight_dest'] = to_code
+    
+    if date_before:
+        try:
+            filter_date_before = parse_datetime(date_before)
+            if not filter_date_before:
+                raise ValueError
+            filters['flight_date__lt'] = filter_date_before
+        except ValueError:
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
+    
+    if date_after:
+        try:
+            filter_date_after = parse_datetime(date_after)
+            if not filter_date_after:
+                raise ValueError
+            filters['flight_date__gt'] = filter_date_after
+        except ValueError:
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
+    
+    filtered_flights = Flight.objects.filter(**filters)
+    serializer = FlightSerializer(filtered_flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_roster_by_flight(request, flight_id):
     try:
         flight = Flight.objects.get(flight_number=flight_id)
@@ -172,6 +210,7 @@ def download_sql(request, flight_id):
     response = HttpResponse(data, content_type='application/db')
     response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.db"'
     return response
+
 
 def assign_seats_helper(flight, flight_number, type):
     allPlaced = []
@@ -273,7 +312,6 @@ def auto_generate_roster(request, flight_number):
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
 
-
     selected_vehicle = flight.vehicle_type
 
     # 0 - Trainee, 1 - Junior, 2 - Senior
@@ -300,8 +338,6 @@ def auto_generate_roster(request, flight_number):
         return Response({"message": "No senior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
 
     # Remaining code remains the same...
-
-
 
     businessPlaced = assign_seats_helper(flight, flight_number,1)
     economyPlaced = assign_seats_helper(flight, flight_number,0)
@@ -437,9 +473,7 @@ def manual_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number,1)
-    economyPlaced = assign_seats_helper(flight, flight_number,0)
-    placed_passengers = businessPlaced + economyPlaced
+
 
     selected_vehicle = flight.vehicle_type
 
@@ -514,7 +548,12 @@ def manual_generate_roster(request, flight_number):
     if total_crew > selected_vehicle.vehicle_crew_capacity:
         return Response({"message": f"Total number of cabin crew exceeds the vehicle capacity."}, status=status.HTTP_400_BAD_REQUEST)
     
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
+
     flight_menu = []
+    flight_menu.append(selected_vehicle.std_menu.all().first())
 
     chefs = CabinCrew.objects.filter(id__in=roster_chef_ids)
     for chef in chefs:
