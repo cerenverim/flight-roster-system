@@ -101,6 +101,44 @@ def get_flights_after(request, date):
 @api_view(['GET'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
+def get_filtered_flights(request, from_code=None, to_code=None, date_before=None, date_after=None):
+    filters = {}
+    
+    if from_code:
+        if len(from_code) != 3:
+            return Response({"error": "Invalid source location code."}, status=status.HTTP_400_BAD_REQUEST)
+        filters['flight_src'] = from_code
+    
+    if to_code:
+        if len(to_code) != 3:
+            return Response({"error": "Invalid destination location code."}, status=status.HTTP_400_BAD_REQUEST)
+        filters['flight_dest'] = to_code
+    
+    if date_before:
+        try:
+            filter_date_before = parse_datetime(date_before)
+            if not filter_date_before:
+                raise ValueError
+            filters['flight_date__lt'] = filter_date_before
+        except ValueError:
+            return Response({"error": "Invalid date format for date_before."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    if date_after:
+        try:
+            filter_date_after = parse_datetime(date_after)
+            if not filter_date_after:
+                raise ValueError
+            filters['flight_date__gt'] = filter_date_after
+        except ValueError:
+            return Response({"error": "Invalid date format for date_after."}, status=status.HTTP_400_BAD_REQUEST)
+    
+    filtered_flights = Flight.objects.filter(**filters)
+    serializer = FlightSerializer(filtered_flights, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@authentication_classes([SessionAuthentication, TokenAuthentication])
+@permission_classes([IsAuthenticated])
 def get_roster_by_flight(request, flight_id):
     try:
         flight = Flight.objects.get(flight_number=flight_id)
@@ -272,6 +310,9 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
+    businessPlaced = assign_seats_helper(flight, flight_number, 1)
+    economyPlaced = assign_seats_helper(flight, flight_number, 0)
+    placed_passengers = businessPlaced + economyPlaced
 
 
     selected_vehicle = flight.vehicle_type

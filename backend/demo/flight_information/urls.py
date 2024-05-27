@@ -15,4 +15,5 @@ urlpatterns = [
     path('flights/to/<str:to_code>', views.get_flights_to, name='flight_to'),
     path('flights/before/<str:date>', views.get_flights_before, name='flight_before'),
     path('flights/after/<str:date>', views.get_flights_after, name='flight_after'),
+    path('flights/from/<str:from_code>/to/<str:to_code>/before/<str:date_before>/after/<str:date_after>/', views.get_filtered_flights, name='flights_filtered'),
 ]
