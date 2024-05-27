@@ -27,7 +27,7 @@ function ViewPage() {
         {
             key: '2',
             label: 'PLANE VIEW',
-            children: <PlaneView type={type} flightCrew={dataSourceFlightCrew} cabinCrew={dataSourceCabinCrew} passengers={dataSourcePassenger} />,
+            children: <PlaneView type={flight.vehicle_type} flightCrew={dataSourceFlightCrew} cabinCrew={dataSourceCabinCrew} passengers={dataSourcePassenger} />,
         },
         {
             key: '3',
@@ -115,7 +115,7 @@ function ViewPage() {
                                 age: passenger.age,
                                 gender: passenger.gender,
                                 nationality: passenger.nationality,
-                                seatType: seatTypleCalculator(type, passenger.seat_no),
+                                seatType: seatTypleCalculator(flight.vehicle_type, passenger.seat_no),
                                 seat: seat_no.toString()
                             };
                         });
@@ -189,7 +189,7 @@ function ViewPage() {
                         age: passenger.age,
                         gender: passenger.gender,
                         nationality: passenger.nationality,
-                        seatType: seatTypleCalculator(type, passenger.seat_no),
+                        seatType: seatTypleCalculator(flight.vehicle_type, passenger.seat_no),
                         seat: seat_no.toString()
                     };
                 });

@@ -7,7 +7,6 @@ import { SearchOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
 const { Content } = Layout;
 function ManualSelectionPage() {
-    const type = useSelector(state => state.flight.rosterType);
     const flight = useSelector(state => state.flight.selectedFlight);
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
 
@@ -20,7 +19,7 @@ function ManualSelectionPage() {
     ]);
     useEffect(() => {
         let flightCrew;
-        PilotApi.getFlightCrew(type).then((response) => {
+        PilotApi.getFlightCrew(flight.vehicle_type).then((response) => {
             console.log(response);
             flightCrew = response.map((item) => ({
                 "key": item.id,
@@ -38,7 +37,7 @@ function ManualSelectionPage() {
         });
 
         let cabinCrew;
-        CabinCrewApi.getCabinCrew(type).then((response) => {
+        CabinCrewApi.getCabinCrew(flight.vehicle_type).then((response) => {
             cabinCrew = response.map((item) => ({
                 "key": item.id,
                 "id": item.id,
@@ -511,7 +510,6 @@ function ManualSelectionPage() {
                 </Space>
                 <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
                     <Button type="primary">CONFIRM</Button>
-                    <Button type="primary">EXPORT</Button>
                 </Space>
             </Content>
         </Layout >

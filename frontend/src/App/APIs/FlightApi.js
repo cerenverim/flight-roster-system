@@ -26,7 +26,7 @@ const getFlightsByFilter = async (filters) => {
     console.log("Filters applied:", filters);
     try {
         // Fetch all flights
-        const response = await baseServiceApi.get('/flights_api/flights');
+        const response = await baseServiceApi.get('/flights_api/flights/');
         const allFlights = response.data;
 
         // Filter flights based on the provided filters
@@ -69,6 +69,19 @@ const generateFlightRoster = async (flightNumber) => {
         console.error('Error during fetching flights:', error.response || error);
         return [];
     }
+}
+const manualGenerateFlightRoster = async (flightNumber, data) => {
+    try {
+        baseServiceApi.defaults.headers.common['Authorization'] = `token ${token}`;
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/manual_generate_roster/`);
+        console.log(response);
+        return response.data;
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        return [];
+    }
+
 }
 
 const deleteFlightRoster = async (flightNumber) => {
