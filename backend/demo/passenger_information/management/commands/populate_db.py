@@ -110,7 +110,7 @@ class Command(BaseCommand):
                       "languages": random.choice([["English", fake.language_name()],
                                                   ["English"]]),
                       "vehicle": random.choice(VehicleType.objects.all()),
-                      "range": random.choice([2500, 5000, 10000, 20000]),
+                      "range": random.choice([1500, 3000, 10000]),
                       # 0 - Trainee, 1 - Junior, 2 - Senior
                       "seniority": fake.random_element(elements=OrderedDict([(2, 0.3),
                                                                              (1, 0.3),
@@ -207,10 +207,10 @@ class Command(BaseCommand):
 
     def generate_database(self):
 
-        self.generate_passengers(1200)
+        self.generate_passengers(2000)
         self.load_vehicle_types()
-        self.generate_flightCrew(50)
-        self.generate_cabinCrew(100)
+        self.generate_flightCrew(100)
+        self.generate_cabinCrew(700)
         self.generate_Dish()
         self.load_airport_data()
         for flight_count in range(1, 11):
@@ -231,11 +231,10 @@ class Command(BaseCommand):
         Dish.objects.all().delete()
         CabinCrew.objects.all().delete()
         Passenger.objects.all().delete()
-        Location.objects.all().delete()
 
 
     def load_vehicle_types(self):
-        if not VehicleType.objects.all().filter(vehicle_name="twin-aisle aircraft"):
+        if not VehicleType.objects.all().filter(vehicle_name="single-aisle aircraft"):
 
             brownie_dish = Dish.objects.all().filter(dish="Brownie")
             if not brownie_dish:
@@ -243,8 +242,7 @@ class Command(BaseCommand):
                 dish.save()
                 brownie_dish = dish
 
-            vehicle = VehicleType(id=3,
-                                  vehicle_name="twin-aisle aircraft",
+            vehicle = VehicleType(vehicle_name="twin-aisle aircraft",
                                   vehicle_passenger_capacity=180,
                                   vehicle_crew_capacity=20,
                                   vehicle_pilot_capacity=8,
@@ -255,7 +253,7 @@ class Command(BaseCommand):
             vehicle.std_menu.set([brownie_dish])
             vehicle.save()
 
-        if not VehicleType.objects.all().filter(vehicle_name="single-aisle aircraft"):
+        if not VehicleType.objects.all().filter(vehicle_name="twin-aisle aircraft"):
 
             bread_roll_dish = Dish.objects.all().filter(dish="Bread Roll")
             if not bread_roll_dish:
@@ -263,8 +261,7 @@ class Command(BaseCommand):
                 dish.save()
                 bread_roll_dish = dish
 
-            vehicle = VehicleType(id=2,
-                                  vehicle_name="single-aisle aircraft",
+            vehicle = VehicleType(vehicle_name="single-aisle aircraft",
                                   vehicle_passenger_capacity=80,
                                   vehicle_crew_capacity=12,
                                   vehicle_pilot_capacity=4,
@@ -283,8 +280,7 @@ class Command(BaseCommand):
                 dish.save()
                 baklava_dish = dish
 
-            vehicle = VehicleType(id=1,
-                                  vehicle_name="regional jet",
+            vehicle = VehicleType(vehicle_name="regional jet",
                                   vehicle_passenger_capacity=20,
                                   vehicle_crew_capacity=6,
                                   vehicle_pilot_capacity=2,
@@ -400,8 +396,6 @@ class Command(BaseCommand):
         location_src, location_dest = fake.random_elements(list(Location.objects.all()), length=2, unique=True)
 
         vehicle_type = random.choice(VehicleType.objects.all())
-        distance = random.randint(1000, 12000)
-        timeMins = distance * 12
 
         flight = Flight(flight_number=flight_number,
                         flight_roster=None,
@@ -410,8 +404,8 @@ class Command(BaseCommand):
                         flight_src=location_src,
 
                         flight_date=flight_date,
-                        flight_duration=timedelta(minutes=timeMins),
-                        flight_distance=distance,
+                        flight_duration=timedelta(days=0, hours=0, minutes=0),
+                        flight_distance=0,
 
                         flight_dest=location_dest,
 
