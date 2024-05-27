@@ -117,6 +117,9 @@ function ViewPage() {
                         // Passenger transformation
                         const passengerSource = response.flight_passengers.map((passengerData, index) => {
                             const { passenger, seat_no } = passengerData;
+                            console.log(passenger);
+                            console.log(seat_no);
+                            console.log(passengerData);
                             return {
                                 key: index.toString(),
                                 passengerId: passenger.id.toString(),
@@ -125,7 +128,7 @@ function ViewPage() {
                                 age: passenger.age,
                                 gender: passenger.gender,
                                 nationality: passenger.nationality,
-                                seatType: seatTypleCalculator(flight.vehicle_type, passenger.seat_no),
+                                seatType: seatTypleCalculator(flight.vehicle_type, seat_no),
                                 seat: seat_no.toString()
                             };
                         });
@@ -191,6 +194,9 @@ function ViewPage() {
                 // Passenger transformation
                 const passengerSource = response.flight_passengers.map((passengerData, index) => {
                     const { passenger, seat_no } = passengerData;
+                    console.log(passenger);
+                    console.log(seat_no);
+                    console.log(passengerData);
                     return {
                         key: index.toString(),
                         passengerId: passenger.id.toString(),
@@ -199,7 +205,7 @@ function ViewPage() {
                         age: passenger.age,
                         gender: passenger.gender,
                         nationality: passenger.nationality,
-                        seatType: seatTypleCalculator(flight.vehicle_type, passenger.seat_no),
+                        seatType: seatTypleCalculator(flight.vehicle_type, seat_no),
                         seat: seat_no.toString()
                     };
                 });
@@ -236,7 +242,6 @@ function ViewPage() {
                         type: "passenger",
                     });
                 }
-                console.log(tempData);
                 setDataSourceTabular(tempData);
             }
 
