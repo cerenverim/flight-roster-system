@@ -211,7 +211,6 @@ def download_sql(request, flight_id):
     response['Content-Disposition'] = f'attachment; filename="roster_{flight_id}.db"'
     return response
 
-
 def assign_seats_helper(flight, flight_number, type):
     allPlaced = []
 
@@ -253,6 +252,8 @@ def assign_seats_helper(flight, flight_number, type):
             
             if len(consecutive_sequence) == seats_needed:
                 assigned_seats = consecutive_sequence[:]
+                for seat in assigned_seats:
+                    available_seat_numbers.remove(seat)
                 break
         
         # If consecutive assignment failed, try assigning seats with skips
@@ -301,6 +302,16 @@ def assign_seats_helper(flight, flight_number, type):
         pas.passenger = passenger
         pas.save()
         allPlaced.append(pas)   
+        
+    for passenger in allPlaced:
+        if passenger.passenger.gender == "Male" and passenger.passenger.affiliated_passenger.exists():
+            affiliated_passengers = passenger.passenger.affiliated_passenger.filter(age__lte=2)
+            for child in affiliated_passengers:
+                pas = PlacedPassenger()
+                pas.seat_no = passenger.seat_no
+                pas.passenger = child
+                pas.save()
+                allPlaced.append(pas)
     
     return allPlaced
 

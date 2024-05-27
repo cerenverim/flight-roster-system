@@ -260,7 +260,13 @@ function ExtendedView({ flightCrew, cabinCrew, passengers }) {
             dataIndex: 'seatType',
             key: 'seatType',
             ...getColumnSearchProps('seatType')
-        }
+        },
+        {
+            title: 'Seat No',
+            dataIndex: 'seat',
+            key: 'seat',
+            ...getColumnSearchProps('seat')
+        },
     ];
     return (
         <>
