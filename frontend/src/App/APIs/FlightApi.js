@@ -1,6 +1,5 @@
 import baseServiceApi from './baseServiceApi';
 
-const FL0001 = "FL0001";
 const getFlightsByID = async (flightNumber) => {
     try {
         // Fetch all flights
@@ -48,6 +47,7 @@ const getFlightsByFilter = async (filters) => {
 
 const getFlightRoster = async (flightNumber) => {
     try {
+        console.log(flightNumber);
         const response = await baseServiceApi.get(`/flights_api/flights/${flightNumber}/roster/`);
         console.log(response);
         return response.data;
@@ -64,7 +64,6 @@ const generateFlightRoster = async (flightNumber) => {
         const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/auto_generate_roster/`);
         console.log(response);
         return response.data;
-
     }
     catch (error) {
         console.error('Error during fetching flights:', error.response || error);
@@ -74,9 +73,66 @@ const generateFlightRoster = async (flightNumber) => {
 
 const deleteFlightRoster = async (flightNumber) => {
     try {
-        const response = await baseServiceApi.delete(`/flights_api/flights/${FL0001}/delete_roster/`);
+        const response = await baseServiceApi.delete(`/flights_api/flights/${flightNumber}/delete_roster/`);
         console.log(response);
         return response.data;
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        throw error;
+    }
+}
+const downloadSql = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.get(`/flights_api/flights/${flightNumber}/roster/sql`, {
+            responseType: 'blob', // Important to receive response as blob
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `roster${flightNumber}.db`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        throw error;
+    }
+}
+const downloadNoSql = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.get(`/flights_api/flights/${flightNumber}/roster/nosql`, {
+            responseType: 'blob', // Important to receive response as blob
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `roster${flightNumber}.bson`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+    }
+    catch (error) {
+        console.error('Error during fetching flights:', error.response || error);
+        throw error;
+    }
+}
+const downloadJson = async (flightNumber) => {
+    try {
+        const response = await baseServiceApi.get(`/flights_api/flights/${flightNumber}/roster/json`, {
+            responseType: 'blob', // Important to receive response as blob
+        });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `roster${flightNumber}.json`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
 
     }
     catch (error) {
@@ -90,5 +146,8 @@ export const FlightApi = {
     getFlightsByFilter,
     getFlightRoster,
     generateFlightRoster,
-    deleteFlightRoster
+    deleteFlightRoster,
+    downloadSql,
+    downloadNoSql,
+    downloadJson
 };

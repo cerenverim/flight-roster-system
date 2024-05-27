@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Route, Routes, Link } from 'react-router-dom';
-import { Table, Typography, } from 'antd';
+import { Table, Typography, Space } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
 function FlightMenu({ menu }) {
     const menuColumns = [{
+        id: 'id',
         title: 'Dishes',
-        dataIndex: 'dishes',
-        key: 'dishes',
+        dataIndex: 'dish',
+        key: 'dish',
     }];
     return (
-        <div style={{ height: '100%', width: '100%' }}>
+        <Space direction='vertical' style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
             <Typography.Title level={4}>Menu</Typography.Title>
             <Table
                 scroll={{ x: true }}
@@ -17,7 +18,7 @@ function FlightMenu({ menu }) {
                 dataSource={menu}
                 columns={menuColumns}
             />
-        </div>
+        </Space>
 
     )
 }

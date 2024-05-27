@@ -19,7 +19,6 @@ const { Header } = Layout;
 function App() {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.user.currentUser);
-
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {

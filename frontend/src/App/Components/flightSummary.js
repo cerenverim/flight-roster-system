@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Route, Routes, Link } from 'react-router-dom';
 import { Row, Col, Space, Button, Tabs, Layout, Dropdown, Divider, } from 'antd';
 import { CalendarOutlined } from '@ant-design/icons';
-function FlightSummary({ fromPoint, toPoint, departureDate }) {
+function FlightSummary({ fromPoint, departureDate, toPoint }) {
     return (
         <Row style={{ height: '80px', backgroundColor: '#ebebeb' }} justify='space-between'>
             <Col style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }} span={7}>
@@ -11,7 +11,6 @@ function FlightSummary({ fromPoint, toPoint, departureDate }) {
                         Departure From:
                     </Space>
                     <Space style={{ color: '#4285f4' }}>
-                        AUH
                         {fromPoint}
                     </Space>
                 </Space>
@@ -23,7 +22,6 @@ function FlightSummary({ fromPoint, toPoint, departureDate }) {
                         Destination:
                     </Space>
                     <Space style={{ color: '#4285f4' }}>
-                        AHG
                         {toPoint}
                     </Space>
                 </Space>
