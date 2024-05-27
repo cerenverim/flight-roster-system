@@ -106,12 +106,12 @@ def get_filtered_flights(request, from_code=None, to_code=None, date_before=None
     
     if from_code:
         if len(from_code) != 3:
-            return Response({"error": "Invalid source location code."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
         filters['flight_src'] = from_code
     
     if to_code:
         if len(to_code) != 3:
-            return Response({"error": "Invalid destination location code."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
         filters['flight_dest'] = to_code
     
     if date_before:
@@ -121,7 +121,7 @@ def get_filtered_flights(request, from_code=None, to_code=None, date_before=None
                 raise ValueError
             filters['flight_date__lt'] = filter_date_before
         except ValueError:
-            return Response({"error": "Invalid date format for date_before."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
     
     if date_after:
         try:
@@ -130,7 +130,7 @@ def get_filtered_flights(request, from_code=None, to_code=None, date_before=None
                 raise ValueError
             filters['flight_date__gt'] = filter_date_after
         except ValueError:
-            return Response({"error": "Invalid date format for date_after."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response([], status=status.HTTP_400_BAD_REQUEST)
     
     filtered_flights = Flight.objects.filter(**filters)
     serializer = FlightSerializer(filtered_flights, many=True)
