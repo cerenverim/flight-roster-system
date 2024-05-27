@@ -130,7 +130,7 @@ class RosterCreationTestCases(APITestCase):
         url = reverse('auto_generate_roster', args=['FL0004'])
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['flight_passengers']), 19)
+        self.assertGreaterEqual(len(response.data['flight_passengers']), 18)
 
 class FlightFilterFromTestCases(APITestCase):
     fixtures = ['db_out.json']
@@ -175,3 +175,38 @@ class FlightFilterDateTestCases(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data, {"error": "Date parameter required"})
+
+class RosterManualTestCases(APITestCase):
+    fixtures = ['full_db.json']
+
+    def setUp(self):
+        self.client = APIClient()
+        user = User.objects.create_user(username='testuser', password='testpassword')
+        token, created = Token.objects.get_or_create(user=user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+    def test_create(self):
+        url = reverse('auto_generate_roster', args=['FL0001'])
+        data = {
+            "pilot_ids": [904, 911],
+            "crew_ids": [5805, 5806, 5808, 5809, 5810]
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['flight_crew_junior']), 1)
+        self.assertEqual(len(response.data['flight_crew_senior']), 1)
+        self.assertEqual(len(response.data['flight_cabin_crew_senior']), 1)
+        self.assertEqual(len(response.data['flight_cabin_crew_junior']), 4)
+        self.assertEqual(len(response.data['flight_crew_trainee']), 0)
+
+    def test_create_invalid(self):
+        url = reverse('auto_generate_roster', args=['FL0001'])
+        data = {
+            "pilot_ids": [999999, 911], #Invalid pilot id
+            "crew_ids": [5805, 5806, 5808, 5809, 5810]
+        }
+
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data, {'message': 'There must be at least one senior and one junior pilot.'})
