@@ -7,7 +7,7 @@ import { setUser, setToken } from '../../actions/userActions';
 import { setAuthToken } from '../APIs/baseServiceApi';
 
 function SignInPage() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false); // Yükleme durumu için state
@@ -26,7 +26,7 @@ function SignInPage() {
             setIsLoading(false); // Yükleme bittiğinde
         } catch (error) {
             console.error('Error during login process:', error);
-            setErrorMessage('Incorrect email or password. Please try again.'); // Hata mesajını set et
+            setErrorMessage('Incorrect username or password. Please try again.'); // Hata mesajını set et
             setIsLoading(false); // Yükleme bittiğinde
         }
     }, [dispatch, navigate]);
@@ -34,8 +34,8 @@ function SignInPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userData = {
-            username: email,
-            password: password
+            username,
+            password
         };
         await handleLogin(userData);
     };
@@ -43,15 +43,15 @@ function SignInPage() {
     return (
         <div className="signin-container">
             <h2>Sign In</h2>
-            <p>Enter your Email and Password</p>
+            <p>Enter your Username and Password</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="username">Username</label>
                     <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        type="text"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
                 </div>

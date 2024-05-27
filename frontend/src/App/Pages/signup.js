@@ -7,7 +7,7 @@ import { setAuthToken } from '../APIs/baseServiceApi';
 import { AuthApi } from '../APIs/AuthApi';
 
 function SignUpPage() {
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordVisible, setPasswordVisible] = useState(false);
@@ -41,8 +41,8 @@ function SignUpPage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const userData = {
-            username: email,
-            password: password
+             username,
+             password
         };
         await handleSignUp(userData);
     };
@@ -61,12 +61,12 @@ function SignUpPage() {
             <p>First create your account</p>
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="username">Username</label>
                     <input
-                        type="email"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        type="text"
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
                 </div>
