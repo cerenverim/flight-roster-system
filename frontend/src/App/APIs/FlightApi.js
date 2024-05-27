@@ -22,23 +22,26 @@ const getFlightsByID = async (flightNumber) => {
     }
 };
 
-const getFlightsByFilter = async (filters) => {
-    console.log("Filters applied:", filters);
+const getFlightsByFilter = async (from, to, before, after) => {
+    let filter = "";
+    if (from !== "") {
+        filter += `from/${from.toUpperCase()}/`;
+    }
+    if (to !== "") {
+        filter += `to/${to.toUpperCase()}/`;
+    }
+    if (before !== "") {
+        filter += `before/${before}/`;
+    }
+    if (after !== "") {
+        filter += `after/${after}/`;
+    }
     try {
         // Fetch all flights
-        const response = await baseServiceApi.get(`/flights_api/flights/from/${filters.from}/to/${filters.to}/before/${filters.depart}/after/${filters.returnDate}/`);
-        const allFlights = response.data;
+        const response = await baseServiceApi.get(`/flights_api/flights/${filter}`);
 
-        // Filter flights based on the provided filters
-        const filteredFlights = allFlights.filter(flight => {
-            // Check each filter criteria; return true if flight matches all non-empty filter fields
-            return (!filters.from || flight.flight_src === filters.from) &&
-                (!filters.to || flight.flight_dest === filters.to) &&
-                (!filters.depart || new Date(flight.flight_date).toDateString() === new Date(filters.depart).toDateString()) &&
-                (!filters.returnDate || (flight.return_date && new Date(flight.return_date).toDateString() === new Date(filters.returnDate).toDateString()));
-        });
 
-        return filteredFlights;
+        return response.data;
     } catch (error) {
         console.error('Error during fetching flights:', error.response || error);
         throw error;
