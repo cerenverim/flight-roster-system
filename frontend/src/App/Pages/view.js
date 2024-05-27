@@ -11,7 +11,6 @@ const { Content } = Layout;
 
 function ViewPage() {
 
-    const type = useSelector(state => state.flight.rosterType);
     const flight = useSelector(state => state.flight.selectedFlight);
     const [dataSourceTabular, setDataSourceTabular] = useState([]);
     const [dataSourcePassenger, setDataSourcePassenger] = useState([]);
@@ -77,6 +76,16 @@ function ViewPage() {
             return 'Economy'
         }
     }
+    const formatDate = (dateString) => {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
     useEffect(() => {
         FlightApi.getFlightRoster(flight.flight_number).then((response) => {
             if (response.length === 0) {
@@ -236,7 +245,7 @@ function ViewPage() {
     return (
         <Layout>
             <Content >
-                <FlightSummary fromPoint={flight.flight_src} departureDate={flight.flight_date} toPoint={flight.flight_dest} />
+                <FlightSummary fromPoint={flight.flight_src} departureDate={formatDate(flight.flight_date)} toPoint={flight.flight_dest} />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />
                 <FlightMenu menu={menu} />
                 <Space align="baseline" style={{ padding: '10px 50px' }}>

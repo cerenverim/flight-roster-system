@@ -17,6 +17,16 @@ function ManualSelectionPage() {
     ]);
     const [dataSourceCabin, setDataSourceCabin] = useState([
     ]);
+    const formatDate = (dateString) => {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
     useEffect(() => {
         let flightCrew;
         PilotApi.getFlightCrew(flight.vehicle_type).then((response) => {
@@ -472,7 +482,7 @@ function ManualSelectionPage() {
     return (
         <Layout >
             <Content >
-                <FlightSummary fromPoint={flight.flight_src} departureDate={flight.flight_date} toPoint={flight.flight_dest} />
+                <FlightSummary fromPoint={flight.flight_src} departureDate={formatDate(flight.flight_date)} toPoint={flight.flight_dest} />
                 <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>
 
                     <Typography.Title level={4}>Flight Crew Selection</Typography.Title>
