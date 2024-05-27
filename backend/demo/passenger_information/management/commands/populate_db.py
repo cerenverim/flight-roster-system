@@ -715,10 +715,6 @@ class Command(BaseCommand):
         # assign seats for plane
         for i in range(1, len(roster_passengers) + 1):
             passenger = roster_passengers[i - 1]
-            placed_passenger = PlacedPassenger(passenger=passenger,
-                                               seat_no=i)
-            placed_passenger.save()
-            placed_passengers.append(placed_passenger)
 
             passenger.seat_no = i
             passenger.save()
