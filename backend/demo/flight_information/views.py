@@ -553,6 +553,7 @@ def manual_generate_roster(request, flight_number):
     placed_passengers = businessPlaced + economyPlaced
 
     flight_menu = []
+    flight_menu.append(selected_vehicle.std_menu.all().first())
 
     chefs = CabinCrew.objects.filter(id__in=roster_chef_ids)
     for chef in chefs:
