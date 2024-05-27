@@ -1,12 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Table, Input, Button, Popconfirm, Space, Layout, Typography } from 'antd';
+import { Table, Input, Button, Popconfirm, Space, Layout, Typography, notification } from 'antd';
 import FlightSummary from '../Components/flightSummary';
 import { PilotApi } from '../APIs/PilotApi';
 import { CabinCrewApi } from '../APIs/CabinApi';
 import { SearchOutlined } from '@ant-design/icons';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { FlightApi } from '../APIs/FlightApi';
 const { Content } = Layout;
 function ManualSelectionPage() {
+    const navigate = useNavigate();
     const flight = useSelector(state => state.flight.selectedFlight);
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
 
@@ -26,6 +29,16 @@ function ManualSelectionPage() {
             minute: '2-digit'
         };
         return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+    const [api, contextHolder] = notification.useNotification();
+    const openNotification = (placement, message) => {
+        api.info({
+            message: `Error while choosing crew`,
+            description:
+                message,
+            placement,
+
+        });
     };
     useEffect(() => {
         let flightCrew;
@@ -479,50 +492,71 @@ function ManualSelectionPage() {
                 ) : null,
         },
     ];
+    function extractId(dataSourceF, dataSourceC) {
+        const idFlight = dataSourceF.map((item) => item.id);
+        const idCabin = dataSourceC.map((item) => item.id);
+        return { "pilot_ids": idFlight, "crew_ids": idCabin };
+    }
+    function checkCrew() {
+        FlightApi.deleteFlightRoster(flight.flight_number).then((response) => {
+            FlightApi.manualGenerateFlightRoster(flight.flight_number, extractId(dataSourceFlight, dataSourceCabin)).then((response) => {
+                if (typeof response === 'string') {
+                    openNotification('topRight', response);
+                }
+                else {
+                    navigate('/view');
+                }
+            });
+        });
+    }
     return (
-        <Layout >
-            <Content >
-                <FlightSummary fromPoint={flight.flight_src} departureDate={formatDate(flight.flight_date)} toPoint={flight.flight_dest} />
-                <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>
+        <>
+            {contextHolder}
+            <Layout >
+                <Content >
+                    <FlightSummary fromPoint={flight.flight_src} departureDate={formatDate(flight.flight_date)} toPoint={flight.flight_dest} />
+                    <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>
 
-                    <Typography.Title level={4}>Flight Crew Selection</Typography.Title>
-                    <Table
-                        rowClassName={() => 'editable-row'}
-                        scroll={{ x: true }}
-                        bordered
-                        dataSource={dataSourceSelectionFlight}
-                        columns={FlightSelectionColumns}
-                    />
-                    <Typography.Title level={4}>Current Flight Crew</Typography.Title>
-                    <Table
-                        rowClassName={() => 'editable-row'}
-                        scroll={{ x: true }}
-                        bordered
-                        dataSource={dataSourceFlight}
-                        columns={FlightCrewColumns}
-                    />
-                    <Typography.Title level={4}>Cabin Crew Selection</Typography.Title>
-                    <Table
-                        rowClassName={() => 'editable-row'}
-                        scroll={{ x: true }}
-                        bordered
-                        dataSource={dataSourceSelectionCabin}
-                        columns={CabinSelectionColumns}
-                    />
-                    <Typography.Title level={4}>Current Cabin Crew</Typography.Title>
-                    <Table
-                        rowClassName={() => 'editable-row'}
-                        scroll={{ x: true }}
-                        bordered
-                        dataSource={dataSourceCabin}
-                        columns={CabinCrewColumns}
-                    />
-                </Space>
-                <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
-                    <Button type="primary">CONFIRM</Button>
-                </Space>
-            </Content>
-        </Layout >
+                        <Typography.Title level={4}>Flight Crew Selection</Typography.Title>
+                        <Table
+                            rowClassName={() => 'editable-row'}
+                            scroll={{ x: true }}
+                            bordered
+                            dataSource={dataSourceSelectionFlight}
+                            columns={FlightSelectionColumns}
+                        />
+                        <Typography.Title level={4}>Current Flight Crew</Typography.Title>
+                        <Table
+                            rowClassName={() => 'editable-row'}
+                            scroll={{ x: true }}
+                            bordered
+                            dataSource={dataSourceFlight}
+                            columns={FlightCrewColumns}
+                        />
+                        <Typography.Title level={4}>Cabin Crew Selection</Typography.Title>
+                        <Table
+                            rowClassName={() => 'editable-row'}
+                            scroll={{ x: true }}
+                            bordered
+                            dataSource={dataSourceSelectionCabin}
+                            columns={CabinSelectionColumns}
+                        />
+                        <Typography.Title level={4}>Current Cabin Crew</Typography.Title>
+                        <Table
+                            rowClassName={() => 'editable-row'}
+                            scroll={{ x: true }}
+                            bordered
+                            dataSource={dataSourceCabin}
+                            columns={CabinCrewColumns}
+                        />
+                    </Space>
+                    <Space style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
+                        <Button type="primary" onClick={checkCrew}>CONFIRM</Button>
+                    </Space>
+                </Content>
+            </Layout >
+        </>
+
 
     );
 }

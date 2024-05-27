@@ -76,14 +76,13 @@ const generateFlightRoster = async (flightNumber) => {
 
 const deleteFlightRoster = async (flightNumber) => {
     try {
-        const response = await baseServiceApi.delete(`/flights_api/flights/${flightNumber}/delete_roster/`);
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/delete_roster/`);
         console.log(response);
         return response.data;
-
     }
     catch (error) {
         console.error('Error during fetching flights:', error.response || error);
-        throw error;
+        return [];
     }
 }
 const downloadSql = async (flightNumber) => {
@@ -145,13 +144,13 @@ const downloadJson = async (flightNumber) => {
 }
 const manualGenerateFlightRoster = async (flightNumber, data) => {
     try {
-        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/manual_generate_roster/`);
+
+        const response = await baseServiceApi.post(`/flights_api/flights/${flightNumber}/manual_generate_roster/`, data);
         console.log(response);
         return response.data;
     }
     catch (error) {
-        console.error('Error during fetching flights:', error.response || error);
-        return [];
+        return error.response.data.message;
     }
 
 }

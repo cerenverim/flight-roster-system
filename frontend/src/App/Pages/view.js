@@ -7,10 +7,11 @@ import FlightSummary from '../Components/flightSummary';
 import FlightMenu from '../Components/flightMenu';
 import { FlightApi } from '../APIs/FlightApi';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 const { Content } = Layout;
 
 function ViewPage() {
-
+    const navigate = useNavigate();
     const flight = useSelector(state => state.flight.selectedFlight);
     const [dataSourceTabular, setDataSourceTabular] = useState([]);
     const [dataSourcePassenger, setDataSourcePassenger] = useState([]);
@@ -248,11 +249,17 @@ function ViewPage() {
                 <FlightSummary fromPoint={flight.flight_src} departureDate={formatDate(flight.flight_date)} toPoint={flight.flight_dest} />
                 <Tabs style={{ padding: '0 50px' }} size='large' defaultActiveKey="1" items={items} />
                 <FlightMenu menu={menu} />
-                <Space align="baseline" style={{ padding: '10px 50px' }}>
-                    <Typography.Title level={4}>Download Roster As:</Typography.Title>
-                    <Button type="primary" onClick={() => FlightApi.downloadSql(flight.flight_number)}>SQL</Button>
-                    <Button type="primary" onClick={() => FlightApi.downloadNoSql(flight.flight_number)}>NoSQL</Button>
-                    <Button type="primary" onClick={() => FlightApi.downloadJson(flight.flight_number)}>JSON</Button>
+                <Space align="baseline" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 50px' }}>
+                    <Space align="baseline" style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0px' }}>
+                        <Typography.Title level={4}>Download Roster As:</Typography.Title>
+                        <Button type="primary" onClick={() => FlightApi.downloadSql(flight.flight_number)}>SQL</Button>
+                        <Button type="primary" onClick={() => FlightApi.downloadNoSql(flight.flight_number)}>NoSQL</Button>
+                        <Button type="primary" onClick={() => FlightApi.downloadJson(flight.flight_number)}>JSON</Button>
+                    </Space>
+                    <Button type="primary" onClick={() => FlightApi.deleteFlightRoster(flight.flight_number).then((response) => {
+                        navigate('/');
+                    })}
+                    >Clear Roster</Button>
                 </Space>
             </Content>
         </Layout >
