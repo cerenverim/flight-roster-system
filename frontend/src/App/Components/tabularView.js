@@ -2,45 +2,7 @@ import { React, useState, useRef } from "react";
 import { Table, Input, Button, Tag, Space } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
-function TabularView() {
-    const [dataSource, setDataSource] = useState([
-        {
-            key: '0',
-            id: 'A78534B219',
-            name: 'Marcus Giles',
-            type: 'passenger',
-        },
-        {
-            key: '1',
-            id: 'B92733H988',
-            name: 'Leyton Christensen',
-            type: 'flight crew',
-        },
-        {
-            key: '2',
-            id: 'Y92833G647',
-            name: 'Victoria Atkinson',
-            type: 'cabin crew',
-        },
-        {
-            key: '3',
-            id: 'L78534G844',
-            name: 'Rowan Barron',
-            type: 'cabin crew',
-        },
-        {
-            key: '4',
-            id: 'Q92733S988',
-            name: 'Zubair Rodrigues',
-            type: 'flight crew',
-        },
-        {
-            key: '5',
-            id: 'Z92833A647',
-            name: 'Siobhan Cantu',
-            type: 'cabin crew',
-        },
-    ]);
+function TabularView({ dataSource }) {
     const [searchText, setSearchText] = useState('');
     const [searchedColumn, setSearchedColumn] = useState('');
     const searchInput = useRef(null);
@@ -169,12 +131,17 @@ function TabularView() {
         },
     ];
     return (
-        <Table
-            scroll={{ x: true }}
-            bordered
-            dataSource={dataSource}
-            columns={defaultColumns}
-        />
+        <div style={{ height: '100%', width: '100%' }}>
+            <Table
+                scroll={{ x: true }}
+                bordered
+                dataSource={dataSource}
+                columns={defaultColumns}
+            />
+
+        </div>
+
+
     );
 }
 

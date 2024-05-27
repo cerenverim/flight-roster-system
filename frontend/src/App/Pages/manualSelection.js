@@ -4,8 +4,11 @@ import FlightSummary from '../Components/flightSummary';
 import { PilotApi } from '../APIs/PilotApi';
 import { CabinCrewApi } from '../APIs/CabinApi';
 import { SearchOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
 const { Content } = Layout;
-function ManualSelectionPage({ type }) {
+function ManualSelectionPage() {
+    const type = useSelector(state => state.flight.rosterType);
+    const flight = useSelector(state => state.flight.selectedFlight);
     const [dataSourceSelectionFlight, setDataSourceSelectionFlight] = useState([
 
     ]);
@@ -17,9 +20,9 @@ function ManualSelectionPage({ type }) {
     ]);
     useEffect(() => {
         let flightCrew;
-        PilotApi.getFlightCrew(1).then((response) => {
-            console.log(response.data);
-            flightCrew = response.data.map((item) => ({
+        PilotApi.getFlightCrew(type).then((response) => {
+            console.log(response);
+            flightCrew = response.map((item) => ({
                 "key": item.id,
                 "id": item.id,
                 "name": item.name,
@@ -35,8 +38,8 @@ function ManualSelectionPage({ type }) {
         });
 
         let cabinCrew;
-        CabinCrewApi.getCabinCrew(1).then((response) => {
-            cabinCrew = response.data.map((item) => ({
+        CabinCrewApi.getCabinCrew(type).then((response) => {
+            cabinCrew = response.map((item) => ({
                 "key": item.id,
                 "id": item.id,
                 "name": item.name,
@@ -470,7 +473,7 @@ function ManualSelectionPage({ type }) {
     return (
         <Layout >
             <Content >
-                <FlightSummary departurePoint='Bengaluru (BLR)' departureDate='Mon, 14 Jun 2021' returnPoint='New Delhi (Del)' returnDate='Fri, 18 Jun 2021' />
+                <FlightSummary fromPoint={flight.flight_src} departureDate={flight.flight_date} toPoint={flight.flight_dest} />
                 <Space direction='vertical' style={{ display: 'flex', padding: '20px 50px 0px 50px' }}>
 
                     <Typography.Title level={4}>Flight Crew Selection</Typography.Title>
