@@ -531,8 +531,8 @@ def manual_generate_roster(request, flight_number):
     if len(roster_senior_pilot_ids) < 1 or len(roster_junior_pilot_ids) < 1:
         return Response({"message": "There must be at least one senior and one junior pilot."}, status=status.HTTP_400_BAD_REQUEST)
 
-    if len(roster_trainee_ids) > 2:
-        return Response({"message": "At most two trainee pilots are allowed."}, status=status.HTTP_400_BAD_REQUEST)
+    if len(roster_trainee_ids) > flight.flight_trainee_limit:
+        return Response({"message": f"At most {flight.flight_trainee_limit} trainee pilots are allowed."}, status=status.HTTP_400_BAD_REQUEST)
 
     if len(roster_senior_cabin_ids) < 1 or len(roster_senior_cabin_ids) > 4:
         return Response({"message": "There must be between 1 and 4 senior cabin crew members."}, status=status.HTTP_400_BAD_REQUEST)
@@ -558,6 +558,7 @@ def manual_generate_roster(request, flight_number):
     total_crew = len(roster_senior_cabin_ids) + len(roster_junior_cabin_ids) + len(roster_chef_ids)
     if total_crew > selected_vehicle.vehicle_crew_capacity:
         return Response({"message": f"Total number of cabin crew exceeds the vehicle capacity."}, status=status.HTTP_400_BAD_REQUEST)
+    
     
     businessPlaced = assign_seats_helper(flight, flight_number,1)
     economyPlaced = assign_seats_helper(flight, flight_number,0)
@@ -611,9 +612,7 @@ def delete_roster(request, flight_number):
 
     placed_passenger_ids = placed_passengers.values_list('id', flat=True)
     PlacedPassenger.objects.filter(id__in=placed_passenger_ids).delete()
-
     flight.flight_roster.delete()
-
     flight.flight_roster = None
     flight.save()
 
