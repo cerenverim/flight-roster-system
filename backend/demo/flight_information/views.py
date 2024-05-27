@@ -218,25 +218,40 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number,1)
-    economyPlaced = assign_seats_helper(flight, flight_number,0)
-    placed_passengers = businessPlaced + economyPlaced
+
 
     selected_vehicle = flight.vehicle_type
 
     # 0 - Trainee, 1 - Junior, 2 - Senior
 
-    senior_pilots = FlightCrew.objects.all().filter(seniority=2,
-                                                    vehicle=selected_vehicle.id)
+    senior_pilots = FlightCrew.objects.filter(seniority=2, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+    
     senior_pilots = list(senior_pilots)
 
-    junior_pilots = FlightCrew.objects.all().filter(seniority=1,
-                                                    vehicle=selected_vehicle.id)
+    junior_pilots = FlightCrew.objects.filter(seniority=1, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+
     junior_pilots = list(junior_pilots)
 
-    trainee_pilots = FlightCrew.objects.all().filter(seniority=0,
-                                                        vehicle=selected_vehicle.id)
+    trainee_pilots = FlightCrew.objects.filter(seniority=0, vehicle=selected_vehicle, max_range__gte=flight.flight_distance)
+
     trainee_pilots = list(trainee_pilots)
+    
+    if not junior_pilots:
+        return Response({"message": "No junior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+
+    if not trainee_pilots:
+        return Response({"message": "No trainee pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+    
+    if not senior_pilots:
+        return Response({"message": "No senior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
+
+    # Remaining code remains the same...
+
+
+
+    businessPlaced = assign_seats_helper(flight, flight_number,1)
+    economyPlaced = assign_seats_helper(flight, flight_number,0)
+    placed_passengers = businessPlaced + economyPlaced
 
     # 0 - Chef, 1 - Junior, 2 - Senior
 
@@ -357,18 +372,14 @@ def auto_generate_roster(request, flight_number):
 '''
 sample input 
 {
-    "roster_junior_pilot_ids": [101, 102],
-    "roster_senior_pilot_ids": [201],
-    "roster_trainee_ids": [301],
-    "roster_senior_cabin_ids": [401, 402],
-    "roster_junior_cabin_ids": [501, 502, 503, 504],
-    "roster_chef_ids": [601, 602]
+  "pilot_ids": [1, 2, 3, 4, 5],  // Example IDs of pilots
+  "crew_ids": [6, 7, 8, 9, 10]   // Example IDs of crew members
 }
 '''
 @api_view(['POST'])
 @authentication_classes([SessionAuthentication, TokenAuthentication])
 @permission_classes([IsAuthenticated])
-def manuel_generate_roster(request, flight_number):
+def manual_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
@@ -377,28 +388,46 @@ def manuel_generate_roster(request, flight_number):
     placed_passengers = businessPlaced + economyPlaced
 
     selected_vehicle = flight.vehicle_type
-    
+
     data = request.data
-    roster_junior_pilot_ids = data.get('roster_junior_pilot_ids', [])
-    roster_senior_pilot_ids = data.get('roster_senior_pilot_ids', [])
-    roster_trainee_ids = data.get('roster_trainee_ids', [])
-    roster_senior_cabin_ids = data.get('roster_senior_cabin_ids', [])
-    roster_junior_cabin_ids = data.get('roster_junior_cabin_ids', [])
-    roster_chef_ids = data.get('roster_chef_ids', [])
+    pilot_ids = data.get('pilot_ids', [])
+    crew_ids = data.get('crew_ids', [])
 
 
-    all_ids = {
-        "roster_junior_pilot_ids": roster_junior_pilot_ids,
-        "roster_senior_pilot_ids": roster_senior_pilot_ids,
-        "roster_trainee_ids": roster_trainee_ids,
-        "roster_senior_cabin_ids": roster_senior_cabin_ids,
-        "roster_junior_cabin_ids": roster_junior_cabin_ids,
-        "roster_chef_ids": roster_chef_ids
-    }
+    if len(pilot_ids) != len(set(pilot_ids)):
+        return Response({"message": f"Provided pilots must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    if len(crew_ids) != len(set(crew_ids)):
+        return Response({"message": f"Provided crews must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        
+    # Initialize separate lists for different seniority levels
+    roster_junior_pilot_ids = []
+    roster_senior_pilot_ids = []
+    roster_trainee_ids = []
+    roster_senior_cabin_ids = []
+    roster_junior_cabin_ids = []
+    roster_chef_ids = []
 
-    for category, ids in all_ids.items():
-        if len(ids) != len(set(ids)):
-            return Response({"message": f"Provided {category} must have unique IDs."}, status=status.HTTP_400_BAD_REQUEST)
+        # Fetching and separating IDs based on seniority
+    pilots = FlightCrew.objects.filter(id__in=pilot_ids)
+    for pilot in pilots:
+        if pilot.seniority == 0:  # Trainee
+            roster_trainee_ids.append(pilot.id)
+        elif pilot.seniority == 1:  # Junior
+            roster_junior_pilot_ids.append(pilot.id)
+        elif pilot.seniority == 2:  # Senior
+            roster_senior_pilot_ids.append(pilot.id)
+        if pilot.max_range < flight.flight_distance:
+            return Response({"message": f"Pilot with ID {pilot.id} does not meet the distance requirement."}, status=status.HTTP_400_BAD_REQUEST)
+
+    crew = CabinCrew.objects.filter(id__in=crew_ids)
+    for crew_member in crew:
+        if crew_member.seniority == 0:  # Chef
+            roster_chef_ids.append(crew_member.id)
+        elif crew_member.seniority == 1:  # Junior
+            roster_junior_cabin_ids.append(crew_member.id)
+        elif crew_member.seniority == 2:  # Senior
+            roster_senior_cabin_ids.append(crew_member.id)
     
     if len(roster_senior_pilot_ids) < 1 or len(roster_junior_pilot_ids) < 1:
         return Response({"message": "There must be at least one senior and one junior pilot."}, status=status.HTTP_400_BAD_REQUEST)
@@ -423,7 +452,7 @@ def manuel_generate_roster(request, flight_number):
 
     all_attendant_ids = roster_senior_cabin_ids + roster_junior_cabin_ids + roster_chef_ids
     attendants = CabinCrew.objects.filter(id__in=all_attendant_ids)
-    for attendant in attendants:
+    for attendant in attendants:    
         if selected_vehicle not in attendant.vehicle.all():
             return Response({"message": f"Attendant {attendant.name} cannot operate in the vehicle type {selected_vehicle.vehicle_name}."}, status=status.HTTP_400_BAD_REQUEST)
         

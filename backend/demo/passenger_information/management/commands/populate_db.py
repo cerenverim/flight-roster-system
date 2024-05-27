@@ -389,11 +389,9 @@ class Command(BaseCommand):
                                           timezone=tz.utc)
 
         # inactive distance algorithm, duration scales with distance so its deactivated
-
-        """flight_distance = int(distance.distance((airport1["Latitude"], airport1["Longitude"]),
-                                                   (airport2["Latitude"], airport2["Longitude"])).km)
+        flight_distance = random.choice([1500, 3000])
+        flight_duration = timedelta(days=0, hours=0, minutes=((flight_distance // 10) // 15) * 15)
     
-        flight_duration = timedelta(days=0, hours=0, minutes=((flight_distance // 10) // 15) * 15)"""
 
         location_src, location_dest = fake.random_elements(list(Location.objects.all()), length=2, unique=True)
 
