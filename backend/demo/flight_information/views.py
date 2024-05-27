@@ -311,10 +311,6 @@ def auto_generate_roster(request, flight_number):
     flight = get_object_or_404(Flight, flight_number=flight_number)
     if flight.flight_roster != None:
         return Response({"message":"Roster already exists!"}, status=status.HTTP_200_OK)
-    businessPlaced = assign_seats_helper(flight, flight_number, 1)
-    economyPlaced = assign_seats_helper(flight, flight_number, 0)
-    placed_passengers = businessPlaced + economyPlaced
-
 
     selected_vehicle = flight.vehicle_type
 
@@ -342,8 +338,6 @@ def auto_generate_roster(request, flight_number):
         return Response({"message": "No senior pilots available with maximum range greater than or equal to the flight distance."}, status=status.HTTP_404_NOT_FOUND)
 
     # Remaining code remains the same...
-
-
 
     businessPlaced = assign_seats_helper(flight, flight_number,1)
     economyPlaced = assign_seats_helper(flight, flight_number,0)
